@@ -745,48 +745,6 @@
 
     const soundQuestion = document.getElementById("soundQuestion");
 
-    const soundIntro = document.getElementById("soundIntro"); // Get reference to the new intro audio
-
-    // Make sounds globally accessible for dollController
-    window.soundGreenLight = soundGreenLight;
-    window.soundRedLight = soundRedLight;
-
-    // --- NEW CODE START ---
-    // Function to attempt playing the audio
-    function playIntroAudio() {
-        if (soundIntro) {
-            soundIntro.play()
-                .then(() => {
-                    console.log("Intro audio started playing.");
-                })
-                .catch(error => {
-                    console.warn("Autoplay of intro audio blocked. User interaction needed.", error);
-                    // Provide a fallback or instruction if autoplay is blocked
-                    // For example, you could show a "Play Sound" button
-                });
-        }
-    }
-
-    // Play intro audio after 3 seconds when the page is fully loaded
-    window.addEventListener('load', () => {
-        setTimeout(playIntroAudio, 3000); // 3000 milliseconds = 3 seconds
-    });
-
-    // To help with autoplay policies:
-    // Some browsers require a user interaction with the document for any audio to play.
-    // By attempting to play a silent sound on *any* click, we can often "unlock" the audio context.
-    document.addEventListener('click', function() {
-        if (soundIntro && soundIntro.paused) { // Check if it's paused or never started
-            // Attempt to play it again (it might be silent for the user on first click, but unlocks context)
-            soundIntro.volume = 0; // Make it silent for this "unlock" attempt
-            soundIntro.play().then(() => {
-                soundIntro.volume = 1; // Reset volume for actual play calls
-            }).catch(e => {
-                // Ignore errors here, this is just to unlock
-            });
-        }
-    }, { once: true });
-
 
     window.gameController = {
 
@@ -819,35 +777,56 @@
     };
 
 
+  function startGame() {
+  document.getElementById("welcome-screen").style.display = "none";
+  document.getElementById("game-container").style.display = "flex";
+  restartGame();
+  quizActive = true;
 
-    function startGame() {
+  // IMPORTANT: Play the intro sound first, as this is the user interaction.
+  if (soundIntro) {
+    soundIntro.currentTime = 0; // Ensure it starts from the beginning
+    soundIntro.play().then(() => {
+      console.log("Intro audio started playing.");
 
-      document.getElementById("welcome-screen").style.display = "none";
+      // After intro audio starts, wait for its duration (or a fixed delay)
+      // then start the doll animation.
+      // Assuming 'soundIntro' is approx 4-5 seconds based on 'squid-game-rules.mp3'
+      // You might adjust this delay based on the actual length of your audio.
+      const delayBeforeDoll = soundIntro.duration ? soundIntro.duration * 1000 : 4000; // Use audio duration or default to 4 seconds
 
-      document.getElementById("game-container").style.display = "flex";
-
-      restartGame();
-
-      quizActive = true;
-
-      
-
-      // Start with doll animation
-
+      setTimeout(() => {
+        // Start with doll animation
+        questionEl.textContent = "Loading...";
+        optionsEl.innerHTML = "";
+        if (window.dollController) {
+          window.dollController.playAction1();
+        }
+        waitingForDoll = true;
+      }, delayBeforeDoll); // Delay before doll animation starts
+    }).catch(error => {
+      console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
+      // Fallback: If audio fails to play, still proceed with the game after a short delay
+      setTimeout(() => {
+        questionEl.textContent = "Loading...";
+        optionsEl.innerHTML = "";
+        if (window.dollController) {
+          window.dollController.playAction1();
+        }
+        waitingForDoll = true;
+      }, 1000); // Shorter fallback delay if audio fails
+    });
+  } else {
+      // Fallback if soundIntro element isn't found
+      console.warn("soundIntro audio element not found. Proceeding without intro sound.");
       questionEl.textContent = "Loading...";
-
       optionsEl.innerHTML = "";
-
       if (window.dollController) {
-
-        window.dollController.playAction1();
-
+          window.dollController.playAction1();
       }
-
       waitingForDoll = true;
-
-    }
-
+  }
+}
 
 
     function updateProgress() {
