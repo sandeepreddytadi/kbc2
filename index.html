@@ -2,125 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KBC Game Show</title>
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <title>Rotate Head with If-Else Animations</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    body {
-      background-color: #000;
-      color: #fff;
-      overflow: hidden;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    .avatar-section {
-      flex: 1;
-      width: 100%;
-      display: flex;
-    }
-
-    model-viewer {
-      width: 80%;
-      height: 100%;
-      background-color: #000;
-    }
-
-    .music-controls {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 10;
-    }
-
-    .mute-button {
-      background-color: #222;
-      border: 1px solid #555;
-      color: white;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-
-    .qa-section {
-      height: 25%;
-      width: 100%;
-      background-color: #111;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 20px;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
-    }
-
-    .question {
-      font-size: 24px;
-      text-align: center;
-      margin-bottom: 20px;
-      color: #f0c420;
-      text-shadow: 0 0 10px #f0c420;
-    }
-
-    .options {
-      display: flex;
-      justify-content: space-evenly;
-    }
-
-    .option-button {
-      background-color: #222;
-      border: 2px solid #f0c420;
-      color: #fff;
-      padding: 12px 24px;
-      font-size: 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 10px #f0c420;
-    }
-
-    .option-button:hover {
-      background-color: #f0c420;
-      color: #000;
-      box-shadow: 0 0 20px #f0c420, 0 0 30px #f0c420;
-    }
+    body { margin: 0; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="avatar-section">
-      <model-viewer src="jack2.glb" autoplay camera-controls disable-zoom shadow-intensity="1" exposure="1.2" style="background-color: transparent;"></model-viewer>
-      <div class="music-controls">
-        <audio id="bg-music" src="https://ia902701.us.archive.org/27/items/kbc-theme/KBC%20theme.mp3" autoplay loop></audio>
-        <button class="mute-button" onclick="toggleMute()">Mute</button>
-      </div>
-    </div>
-    <div class="qa-section">
-      <div class="question">Which of these is the capital of France?</div>
-      <div class="options">
-        <button class="option-button">A. Rome</button>
-        <button class="option-button">B. Madrid</button>
-        <button class="option-button">C. Berlin</button>
-        <button class="option-button">D. Paris</button>
-      </div>
-    </div>
-  </div>
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js';
 
-  <script>
-    const bgMusic = document.getElementById("bg-music");
-    function toggleMute() {
-      bgMusic.muted = !bgMusic.muted;
+let scene, camera, renderer, mixer;
+let rotateTo180, rotateTo0;
+
+init();
+
+function init() {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 1.5, 3);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+  light.position.set(0, 20, 0);
+  scene.add(light);
+
+  const loader = new GLTFLoader();
+  loader.load('doll.glb', function (gltf) {
+    const model = gltf.scene;
+    scene.add(model);
+
+    mixer = new THREE.AnimationMixer(model);
+
+    const animations = gltf.animations;
+
+    rotateTo180 = mixer.clipAction(animations.find(a => a.name === 'o to 18o degree'));
+    rotateTo0   = mixer.clipAction(animations.find(a => a.name === '18o to o degree'));
+
+    rotateTo0.play(); // Default pose
+  });
+
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+    if (mixer) mixer.update(delta);
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Trigger animation via key press
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'r') {
+      triggerRotation(true);  // Run 0 to 180
+    } else if (event.key === 'b') {
+      triggerRotation(false); // Run 180 to 0
     }
-  </script>
+  });
+}
+
+function triggerRotation(to180) {
+  if (!rotateTo180 || !rotateTo0) return;
+
+  // Stop both before playing the desired one
+  rotateTo180.stop();
+  rotateTo0.stop();
+
+  if (to180) {
+    rotateTo180.reset().fadeIn(0.2).play();
+  } else {
+    rotateTo0.reset().fadeIn(0.2).play();
+  }
+}
+</script>
 </body>
 </html>
