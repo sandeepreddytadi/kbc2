@@ -9,19 +9,21 @@
     canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
 
     .quiz-container-wrapper {
-  width: 80vw;
-  height: 80vh;
-  padding: 2%;
-  box-sizing: border-box;
-  background: rgba(0, 47, 79, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px;
-}
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      background: rgba(0, 47, 79, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 30px 20px;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
     .container, .welcome-screen {
       width: 100%;
@@ -315,11 +317,11 @@
     function loadQuestion() {
       clearInterval(timer);
       if (currentIndex >= questions.length) {
-        questionEl.innerHTML = `<div class="final-congrats">
+        questionEl.innerHTML = <div class="final-congrats">
           <h2>🎉 Congratulations!</h2>
           <p>You've completed the quiz!</p>
           <div class="final-badge">🏆 Quiz Master!</div>
-        </div>`;
+        </div>;
         optionsEl.innerHTML = "";
         timerEl.textContent = "";
         difficultyEl.textContent = "";
@@ -336,7 +338,7 @@
       }, 1000);
 
       updateProgress();
-      difficultyEl.textContent = `🔎 Difficulty: ${q.d}`;
+      difficultyEl.textContent = 🔎 Difficulty: ${q.d};
       questionEl.textContent = q.q;
       optionsEl.innerHTML = "";
 
@@ -367,7 +369,7 @@
     }
 
     function updateTimer() {
-      timerEl.textContent = `⏱️ ${timeLeft}s`;
+      timerEl.textContent = ⏱️ ${timeLeft}s;
     }
 
     function endGame(msg) {
