@@ -1,68 +1,128 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <title>KBC + GLB Model Background</title>
+
   <style>
+
     body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+
+
 
     canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
 
+
+
     .quiz-container-wrapper {
+
       position: absolute;
+
       top: 0;
+
       right: 0;
+
       width: 70%;
+
       height: 100%;
+
       background: transparent;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+
       padding: 30px 20px;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+
       z-index: 10;
+
       display: flex;
+
       justify-content: center;
+
       align-items: center;
+
       overflow-y: auto;
+
     }
+
+
 
     .container {
+
       display: none;
+
       flex-direction: row;
+
       width: 95%;
+
       max-width: 1200px;
+
       gap: 20px;
+
     }
+
+
 
     .welcome-screen {
+
       text-align: center;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       gap: 20px;
+
       color: #fff;
+
     }
+
+
 
     .welcome-logo {
+
       font-size: 2em;
+
       color: gold;
+
     }
+
+
 
     .start-btn {
+
       background-color: gold;
+
       color: black;
+
       font-size: 1.2em;
+
       font-weight: bold;
+
       padding: 12px 24px;
+
       border: none;
+
       border-radius: 8px;
+
       cursor: pointer;
+
       transition: background-color 0.3s ease;
+
     }
 
+
+
     .start-btn:hover {
+
       background-color: #ffd700;
+
     }
+
+
 
     .game-container {
 
@@ -520,41 +580,111 @@
 
 
 
-      const loader = new GLTFLoader();
-
-      loader.load('doll.glb', function (gltf) {
-
-        const model = gltf.scene;
-
-        scene.add(model);
-
-
-
-        const exportedCameras = gltf.cameras;
-
-        if (exportedCameras && exportedCameras.length > 0) {
-
-          camera = exportedCameras[0];
-
+      // Create a placeholder 3D doll (cylinder + sphere for head)
+      const dollGroup = new THREE.Group();
+      
+      // Body (cylinder)
+      const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.8, 3, 8);
+      const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0xff6b6b });
+      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+      body.position.y = 1.5;
+      dollGroup.add(body);
+      
+      // Head (sphere)
+      const headGeometry = new THREE.SphereGeometry(0.6, 8, 6);
+      const headMaterial = new THREE.MeshLambertMaterial({ color: 0xfdbcb4 });
+      const head = new THREE.Mesh(headGeometry, headMaterial);
+      head.position.y = 3.6;
+      dollGroup.add(head);
+      
+      // Eyes
+      const eyeGeometry = new THREE.SphereGeometry(0.1, 8, 6);
+      const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+      leftEye.position.set(-0.2, 3.7, 0.5);
+      const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+      rightEye.position.set(0.2, 3.7, 0.5);
+      dollGroup.add(leftEye);
+      dollGroup.add(rightEye);
+      
+      scene.add(dollGroup);
+      
+      // Create manual animation system
+      let rotationTarget = 0;
+      let currentRotation = 0;
+      let isAnimating = false;
+      
+      window.dollController = {
+        playAction1: function() {
+          if (isAnimating) return;
+          isAnimating = true;
+          dollAnimationState = 'animating';
+          rotationTarget = Math.PI; // 180 degrees
+          
+          // Play green light sound
+          const greenSound = document.getElementById('soundGreenLight');
+          if (greenSound) {
+            greenSound.currentTime = 0;
+            greenSound.play().catch(() => {});
+          }
+        },
+        
+        playAction2: function() {
+          if (isAnimating) return;
+          isAnimating = true;
+          dollAnimationState = 'animating';
+          rotationTarget = 0; // 0 degrees
+          
+          // Play red light sound  
+          const redSound = document.getElementById('soundRedLight');
+          if (redSound) {
+            redSound.currentTime = 0;
+            redSound.play().catch(() => {});
+          }
+        },
+        
+        getState: function() {
+          return dollAnimationState;
         }
-
-
-
-        mixer = new THREE.AnimationMixer(model);
-
-        const animations = gltf.animations;
-
-
-
-        action1 = mixer.clipAction(animations.find(a => a.name === "o to 18o degree"));
-
-        action2 = mixer.clipAction(animations.find(a => a.name === "18o to o degree"));
-
-      }, undefined, function (error) {
-
-        console.log('GLB file not found, continuing without 3D model');
-
-      });
+      };
+      
+      // Animation update function
+      function updateDollAnimation() {
+        if (isAnimating) {
+          const speed = 0.05;
+          const diff = rotationTarget - currentRotation;
+          
+          if (Math.abs(diff) < 0.01) {
+            currentRotation = rotationTarget;
+            isAnimating = false;
+            
+            if (rotationTarget === Math.PI) {
+              dollAnimationState = 'waiting';
+            } else {
+              dollAnimationState = 'idle';
+              // Trigger question load after 3 seconds
+              setTimeout(() => {
+                if (window.gameController) {
+                  window.gameController.loadQuestionAfterDoll();
+                }
+              }, 3000);
+            }
+          } else {
+            currentRotation += diff * speed;
+          }
+          
+          dollGroup.rotation.y = currentRotation;
+        }
+      }
+      
+      // Add animation update to render loop
+      const originalAnimate = window.animate;
+      window.animate = function() {
+        requestAnimationFrame(window.animate);
+        const delta = clock.getDelta();
+        updateDollAnimation();
+        renderer.render(scene, camera);
+      };
 
 
 
@@ -571,8 +701,6 @@
 
 
       window.addEventListener('keydown', (event) => {
-
-        if (!mixer || !action1 || !action2) return;
 
         if (event.key.toLowerCase() === 'r' && dollAnimationState === 'waiting') {
 
@@ -597,8 +725,6 @@
       requestAnimationFrame(animate);
 
       const delta = clock.getDelta();
-
-      if (mixer) mixer.update(delta);
 
       renderer.render(scene, camera);
 
@@ -679,6 +805,10 @@
   <audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
 
   <audio id="soundWrong" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg" preload="auto"></audio>
+
+  <audio id="soundGreenLight" src="audio/doll-green-light.mp3" preload="auto"></audio>
+
+  <audio id="soundRedLight" src="audio/doll-red-light.mp3" preload="auto"></audio>
 
 
 
