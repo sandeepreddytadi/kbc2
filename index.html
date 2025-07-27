@@ -55,6 +55,20 @@ function init() {
     rotateTo0.play(); // Default pose
   });
 
+  const animNames = gltf.animations.map(a => a.name);
+console.log('Available animations:', animNames);
+
+const anim180 = gltf.animations.find(a => a.name === '0 to 180 degree');
+const anim0 = gltf.animations.find(a => a.name === '180 to 0 degree');
+
+if (!anim180 || !anim0) {
+  alert("Animations not found: " + animNames.join(", "));
+  return;
+}
+
+actionTo180 = mixer.clipAction(anim180);
+actionTo0 = mixer.clipAction(anim0);
+
   const clock = new THREE.Clock();
 
   function animate() {
