@@ -10,7 +10,8 @@
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
-                "GLTFLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js"
+                "GLTFLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js",
+                "OrbitControls": "https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js"
             }
         }
     </script>
@@ -22,30 +23,32 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            display: flex;
-            justify-content: flex-start;
-            align-items: stretch;
-            overflow: hidden;
+            display: flex; /* Use flexbox for side-by-side layout */
+            justify-content: space-between; /* Distribute space */
+            align-items: stretch; /* Stretch items to fill height */
+            overflow: hidden; /* Prevent body scroll */
         }
         #glb-canvas {
-            width: 25vw;
+            width: 50vw; /* Doll canvas takes 50% width */
             height: 100vh;
             display: block;
             background-color: transparent; /* Make canvas transparent */
         }
         .quiz-container-wrapper {
-            width: 75vw;
+            width: 50vw; /* Quiz takes 50% width */
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-y: auto;
+            overflow-y: auto; /* Allow scrolling for quiz content if needed */
+            padding: 20px; /* Add some padding for the quiz content */
+            box-sizing: border-box; /* Include padding in the width calculation */
         }
         .container {
             display: none;
-            flex-direction: row;
+            flex-direction: column; /* Changed to column for better quiz layout */
             width: 95%;
-            max-width: 1200px;
+            max-width: 800px; /* Adjust max-width for better readability */
             gap: 20px;
         }
         .welcome-screen {
@@ -77,7 +80,7 @@
             background-color: #003366;
             border-radius: 10px;
             padding: 20px;
-            flex: 2;
+            flex-grow: 1; /* Allow it to grow and fill space */
             box-shadow: 0 0 20px #ffd700;
             display: flex;
             flex-direction: column;
@@ -198,14 +201,13 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000; /* Increased z-index to be above everything */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
             background-color: rgba(0,0,0,0.7);
-            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -295,8 +297,9 @@
     <script type="module">
         import * as THREE from 'three';
         import { GLTFLoader } from 'GLTFLoader';
+        import { OrbitControls } from 'OrbitControls'; // Import OrbitControls
 
-        // KBC Quiz Script
+        // KBC Quiz Script (remains largely the same)
         const allQuestions = [
             { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1, d: "easy" },
             { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1, d: "easy" },
@@ -325,7 +328,6 @@
         const soundWrong = document.getElementById("soundWrong");
         const soundQuestion = document.getElementById("soundQuestion");
 
-        // Modal elements
         const modal = document.getElementById("myModal");
         const modalTitle = document.getElementById("modalTitle");
         const modalMessage = document.getElementById("modalMessage");
@@ -343,13 +345,7 @@
         window.startGame = function() {
             document.getElementById("welcome-screen").style.display = "none";
             document.getElementById("game-container").style.display = "flex";
-            restartGame();
-            // Immediately rotate doll's head away and show loading
-            if (mixer && action2) { // Play "18o to o degree" which will rotate to 180 (away)
-                action1.stop();
-                action2.reset();
-                action2.play();
-            }
+            restartGame(); // This will trigger doll to face away
             questionEl.textContent = "Loading....";
             optionsEl.innerHTML = "";
             timerEl.textContent = "";
@@ -424,10 +420,10 @@
                 playSound(soundCorrect);
                 currentIndex++;
                 setTimeout(() => {
-                    if (mixer && action2) { // Play "18o to o degree" which rotates to 180 (away)
+                    if (mixer && action2) {
                         action1.stop();
-                        action2.reset();
-                        action2.play();
+                        action2.reset().setEffectiveTimeScale(1).play(); // Play away animation
+                        isAction1Playing = false; // Doll is now facing away
                     }
                     questionEl.textContent = "Loading....";
                     optionsEl.innerHTML = "";
@@ -463,7 +459,6 @@
             questions = [...allQuestions].sort(() => 0.5 - Math.random());
             currentIndex = 0;
             updateProgress();
-            // Do not load question immediately here, wait for 'R' press
             questionEl.textContent = "Loading....";
             optionsEl.innerHTML = "";
             timerEl.textContent = "";
@@ -472,8 +467,8 @@
             // Ensure doll faces away when restarting
             if (mixer && action2) {
                 action1.stop();
-                action2.reset();
-                action2.play();
+                action2.reset().setEffectiveTimeScale(1).play(); // Play away animation
+                isAction1Playing = false; // Doll is now facing away
             }
         }
 
@@ -507,7 +502,7 @@
             usedPhone = true;
             document.getElementById("lifelinePhone").disabled = true;
             const correct = questions[currentIndex].c;
-            const i = Math.random() < 0.8 ? correct : (correct + Math.floor(Math.random() * 3) + 1) % 4; // Ensure a different wrong answer if random
+            const i = Math.random() < 0.8 ? correct : (correct + Math.floor(Math.random() * 3) + 1) % 4;
             showModal("📞 Phone a Friend", `Your friend suggests: "${questions[currentIndex].a[i]}"`);
         }
 
@@ -517,7 +512,7 @@
             document.getElementById("lifelineAudience").disabled = true;
             const correct = questions[currentIndex].c;
             let msg = "📊 Audience Poll:\n";
-            let correctPercentage = 60 + Math.floor(Math.random() * 20); // 60-80% for correct
+            let correctPercentage = 60 + Math.floor(Math.random() * 20);
             let remainingPercentage = 100 - correctPercentage;
             let otherPercentages = [];
 
@@ -542,9 +537,9 @@
         }
 
         // GLB Model Script (Three.js)
-        let scene, camera, renderer, mixer, clock;
-        let action1, action2; // These will be your animation actions
-        let isAction1Playing = true; // True if "o to 18o degree" is playing (doll faces player)
+        let scene, camera, renderer, mixer, clock, controls;
+        let action1, action2;
+        let isAction1Playing = false; // True if "o to 18o degree" is playing (doll faces player)
         const glbCanvas = document.getElementById("glb-canvas");
 
         initThreeJS();
@@ -554,15 +549,16 @@
             clock = new THREE.Clock();
 
             scene = new THREE.Scene();
-            // For transparency, the scene background should be null or an alpha-enabled color
-            scene.background = null;
+            scene.background = null; // Make scene background transparent
 
-            camera = new THREE.PerspectiveCamera(45, (0.25 * window.innerWidth) / window.innerHeight, 0.1, 100);
-            camera.position.set(0, 1.5, 4); // Position camera to view the doll
+            camera = new THREE.PerspectiveCamera(45, (0.5 * window.innerWidth) / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 1.5, 4); // Adjust camera to better view the doll
 
-            renderer = new THREE.WebGLRenderer({ canvas: glbCanvas, antialias: true, alpha: true }); // alpha: true for transparency
-            renderer.setSize(0.25 * window.innerWidth, window.innerHeight);
+            renderer = new THREE.WebGLRenderer({ canvas: glbCanvas, antialias: true, alpha: true });
+            renderer.setSize(0.5 * window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); // Improve rendering quality
 
+            // Lights
             const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
             scene.add(ambientLight);
 
@@ -570,60 +566,61 @@
             directionalLight.position.set(10, 20, 10);
             scene.add(directionalLight);
 
+            // Add OrbitControls for debugging/camera movement (optional, but helpful)
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.target.set(0, 1.0, 0); // Focus controls on the doll's center
+            controls.update();
+            controls.enableDamping = true; // Smooth camera movement
+            controls.dampingFactor = 0.05;
+
             const loader = new GLTFLoader();
             loader.load('doll.glb', function (gltf) {
                 const model = gltf.scene;
                 scene.add(model);
 
-                // Assuming the GLB has "o to 18o degree" (facing player) and "18o to o degree" (facing away)
+                // Adjust model scale or position if needed
+                // model.scale.set(1.0, 1.0, 1.0); // Example scaling
+                // model.position.y = -0.5; // Example positioning
+
                 mixer = new THREE.AnimationMixer(model);
                 const animations = gltf.animations;
 
+                // IMPORTANT: Ensure these animation names match your GLB file exactly!
                 action1 = mixer.clipAction(animations.find(a => a.name === "o to 18o degree")); // Doll faces player
                 action2 = mixer.clipAction(animations.find(a => a.name === "18o to o degree")); // Doll faces away
 
-                // Set actions to not loop by default, we'll control them
-                if (action1) action1.loop = THREE.LoopOnce;
-                if (action2) action2.loop = THREE.LoopOnce;
-                if (action1) action1.clampWhenFinished = true;
-                if (action2) action2.clampWhenFinished = true;
-
-                // Initially set the doll to face away (180 degrees)
-                if (action2) {
-                    action2.play();
-                    isAction1Playing = false; // Action2 (facing away) is now playing
+                if (action1) {
+                    action1.loop = THREE.LoopOnce;
+                    action1.clampWhenFinished = true;
                 } else {
-                    console.warn("Animation '18o to o degree' not found. Doll might not face away initially.");
+                    console.warn("Animation 'o to 18o degree' not found.");
+                }
+                
+                if (action2) {
+                    action2.loop = THREE.LoopOnce;
+                    action2.clampWhenFinished = true;
+                    // Play action2 initially to make doll face away
+                    action2.play();
+                    isAction1Playing = false; // Doll is initially facing away
+                } else {
+                    console.warn("Animation '18o to o degree' not found.");
                 }
 
-                // Event listener for when an animation finishes
                 mixer.addEventListener('finished', (e) => {
-                    if (e.action === action1 && quizActive) { // If "o to 18o degree" finished AND quiz is active (meaning question appeared)
-                         // This means the doll finished facing the player, and we're ready for an answer or time-out.
-                         // No action needed on animation end here, the quiz flow will handle rotations.
-                    } else if (e.action === action2 && !quizActive && !modal.style.display === "flex") { // If "18o to o degree" finished AND quiz is not active AND no modal is open
-                        // This means the doll finished facing away, and we're waiting for 'R'
-                    }
+                    // Logic for what happens after an animation finishes, if needed.
+                    // For this setup, the main logic for starting next actions is tied to key presses or quiz answers.
                 });
 
-                // Get head for manual rotation fallback if animations don't cover it
-                // You might need to adjust this based on your GLB's hierarchy
-                // For a typical human model, the head bone might be named "Head" or "mixamorigHead"
-                // If your doll has a specific object that controls its head rotation, find it here.
-                // For the 'doll.glb' from the previous context, you'd typically have animations control the whole pose.
-                // The 'head' variable from previous simple doll is replaced by GLB animations.
-                // If you *must* manually control the head for some reason, you'd need to find the specific bone.
-                // Example: model.traverse(node => { if (node.isBone && node.name === 'Head') head = node; });
-                // But generally, with animations like "0 to 180" and "180 to 0", you rely on the mixer.
             }, undefined, function (error) {
                 console.error('Error loading GLB model:', error);
-                // Fallback or error message for the user
+                // You might want to display a message to the user here
             });
 
             window.addEventListener('resize', () => {
-                camera.aspect = (0.25 * window.innerWidth) / window.innerHeight;
+                camera.aspect = (0.5 * window.innerWidth) / window.innerHeight;
                 camera.updateProjectionMatrix();
-                renderer.setSize(0.25 * window.innerWidth, window.innerHeight);
+                renderer.setSize(0.5 * window.innerWidth, window.innerHeight);
+                controls.update();
             });
         }
 
@@ -631,6 +628,7 @@
             requestAnimationFrame(animateThreeJS);
             const delta = clock.getDelta();
             if (mixer) mixer.update(delta);
+            if (controls) controls.update(); // Update controls in the animation loop
             renderer.render(scene, camera);
         }
 
@@ -638,10 +636,10 @@
         window.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'r') {
                 if (mixer && action1 && action2) {
-                    if (!quizActive) { // If quiz is not active (doll facing away), press 'R' to start question
+                    if (!quizActive && !isAction1Playing) { // If quiz is not active AND doll is facing away
+                        // Transition from facing away (action2) to facing player (action1)
                         action2.stop();
-                        action1.reset();
-                        action1.play(); // Play "o to 18o degree" (doll faces player)
+                        action1.reset().setEffectiveTimeScale(1).play(); // Play action1 (facing player)
                         isAction1Playing = true;
                         console.log('Doll rotating to face player. Question will appear in 6 seconds.');
                         
@@ -656,11 +654,13 @@
                                 loadQuestion();
                             }
                         }, 6000); // 3 seconds for rotation + 3 seconds delay for question
-                    } else {
+                    } else if (quizActive) {
                         console.log('Quiz is already active. Pressing "R" again will not rotate the doll or restart the question.');
+                    } else if (isAction1Playing) {
+                        console.log('Doll is already facing the player. Waiting for a question or an answer.');
                     }
                 } else {
-                    console.warn("Mixer or animation actions not loaded yet.");
+                    console.warn("Mixer or animation actions not loaded yet. Make sure 'doll.glb' exists and has animations.");
                 }
             }
         });
