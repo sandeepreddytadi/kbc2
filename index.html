@@ -783,39 +783,40 @@
   restartGame();
   quizActive = true;
 
-  // IMPORTANT: Play the intro sound first, as this is the user interaction.
   if (soundIntro) {
     soundIntro.currentTime = 0; // Ensure it starts from the beginning
-    soundIntro.play().then(() => {
-      console.log("Intro audio started playing.");
 
-      // After intro audio starts, wait for its duration (or a fixed delay)
-      // then start the doll animation.
-      // Assuming 'soundIntro' is approx 4-5 seconds based on 'squid-game-rules.mp3'
-      // You might adjust this delay based on the actual length of your audio.
-      const delayBeforeDoll = soundIntro.duration ? soundIntro.duration * 1000 : 4000; // Use audio duration or default to 4 seconds
-
-      setTimeout(() => {
-        // Start with doll animation
+    // Define a function to start the doll animation
+    const startDollAnimation = () => {
         questionEl.textContent = "Loading...";
         optionsEl.innerHTML = "";
         if (window.dollController) {
-          window.dollController.playAction1();
+            window.dollController.playAction1();
         }
         waitingForDoll = true;
-      }, delayBeforeDoll); // Delay before doll animation starts
-    }).catch(error => {
-      console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
-      // Fallback: If audio fails to play, still proceed with the game after a short delay
-      setTimeout(() => {
-        questionEl.textContent = "Loading...";
-        optionsEl.innerHTML = "";
-        if (window.dollController) {
-          window.dollController.playAction1();
-        }
-        waitingForDoll = true;
-      }, 1000); // Shorter fallback delay if audio fails
+    };
+
+    // Add an event listener for when the intro sound ends
+    soundIntro.addEventListener('ended', function onIntroEnded() {
+        console.log("Intro audio ended. Waiting 3 seconds for doll animation.");
+        // Remove the listener to prevent it from firing multiple times if game restarts
+        soundIntro.removeEventListener('ended', onIntroEnded);
+
+        // Wait 3 seconds after the audio ends before starting doll animation
+        setTimeout(startDollAnimation, 3000); // 3000 milliseconds = 3 seconds
     });
+
+    // Attempt to play the intro sound
+    soundIntro.play()
+        .then(() => {
+            console.log("Intro audio started playing.");
+        })
+        .catch(error => {
+            console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
+            // Fallback: If audio fails to play, still proceed with the game after a short delay
+            // and skip waiting for audio to end
+            setTimeout(startDollAnimation, 1000); // Shorter fallback delay if audio fails
+        });
   } else {
       // Fallback if soundIntro element isn't found
       console.warn("soundIntro audio element not found. Proceeding without intro sound.");
