@@ -289,7 +289,7 @@
       <button class="start-btn" onclick="startGame()">▶️ Start Game</button>
     </div>
 
-    <div class="container" id="game-container" style="display:none;">
+    <div class="container" id="game-container">
       <div class="game-container">
         <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
         <div class="lifelines">
@@ -311,10 +311,24 @@
     </div>
   </div>
 
+  <audio id="soundQuestion" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+  <audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+  <audio id="soundWrong" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg" preload="auto"></audio>
+
   <script>
     const allQuestions = [
       { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1, d: "easy" },
-      { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2, d: "medium" }
+      { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1, d: "easy" },
+      { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2, d: "medium" },
+      { q: "Purpose of GPU in AI?", a: ["Power", "Rendering", "Parallel processing", "Memory"], c: 2, d: "medium" },
+      { q: "Facebook AI framework?", a: ["Keras", "Theano", "PyTorch", "CNTK"], c: 2, d: "medium" },
+      { q: "NLP stands for?", a: ["Neural LP", "Natural Language Processing", "Net Language Python", "None"], c: 1, d: "easy" },
+      { q: "Image recognition model?", a: ["CNN", "RNN", "GAN", "MLP"], c: 0, d: "medium" },
+      { q: "Google’s AI assistant?", a: ["Alexa", "Siri", "Google Assistant", "Bixby"], c: 2, d: "easy" },
+      { q: "Non ML type?", a: ["Supervised", "Reinforcement", "Sequential", "Unsupervised"], c: 2, d: "medium" },
+      { q: "Activation function use?", a: ["Normalize", "Overfit", "Initialize", "Non-linearity"], c: 3, d: "medium" },
+      { q: "BERT by?", a: ["IBM", "Google", "Meta", "Amazon"], c: 1, d: "medium" },
+      { q: "GAN stands for?", a: ["Graphical AI Network", "General Adv Network", "Generative Adversarial Network", "Generic AI Node"], c: 2, d: "medium" }
     ];
 
     let questions, currentIndex = 0, timer, timeLeft = 30;
@@ -325,11 +339,16 @@
     const timerEl = document.getElementById("timer");
     const difficultyEl = document.getElementById("difficulty");
     const progressBar = document.getElementById("progress-bar");
+    const soundCorrect = document.getElementById("soundCorrect");
+    const soundWrong = document.getElementById("soundWrong");
+    const soundQuestion = document.getElementById("soundQuestion");
 
     function startGame() {
       document.getElementById("welcome-screen").style.display = "none";
-      document.getElementById("game-container").style.display = "block";
+      document.getElementById("game-container").style.display = "flex";
       restartGame();
+      quizActive = true;
+      loadQuestion();
     }
 
     function updateProgress() {
@@ -340,14 +359,17 @@
     function loadQuestion() {
       clearInterval(timer);
       if (currentIndex >= questions.length) {
-        questionEl.innerHTML = <div class="final-congrats">
+        confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
+        questionEl.innerHTML = `<div class="final-congrats">
           <h2>🎉 Congratulations!</h2>
-          <p>You've completed the quiz!</p>
+          <p>You've answered all questions!</p>
           <div class="final-badge">🏆 Quiz Master!</div>
-        </div>;
+        </div>`;
         optionsEl.innerHTML = "";
         timerEl.textContent = "";
         difficultyEl.textContent = "";
+        document.querySelectorAll(".lifeline-btn").forEach(btn => btn.style.display = "none");
+        progressBar.style.width = "100%";
         return;
       }
 
@@ -361,9 +383,12 @@
       }, 1000);
 
       updateProgress();
-      difficultyEl.textContent = 🔎 Difficulty: ${q.d};
+      difficultyEl.textContent = `🔎 Difficulty: ${q.d.charAt(0).toUpperCase() + q.d.slice(1)}`;
       questionEl.textContent = q.q;
       optionsEl.innerHTML = "";
+
+      soundQuestion.currentTime = 0;
+      soundQuestion.play();
 
       q.a.forEach((option, i) => {
         const btn = document.createElement("button");
@@ -387,12 +412,20 @@
         }
       });
 
-      currentIndex++;
-      setTimeout(loadQuestion, 1500);
+      if (i === correct) {
+        soundCorrect.currentTime = 0;
+        soundCorrect.play();
+        currentIndex++;
+        setTimeout(loadQuestion, 1500);
+      } else {
+        soundWrong.currentTime = 0;
+        soundWrong.play();
+        setTimeout(() => endGame("❌ Wrong Answer!"), 1500);
+      }
     }
 
     function updateTimer() {
-      timerEl.textContent = ⏱️ ${timeLeft}s;
+      timerEl.textContent = `⏱️ ${timeLeft}s`;
     }
 
     function endGame(msg) {
@@ -401,11 +434,14 @@
       optionsEl.innerHTML = "";
       timerEl.textContent = "";
       difficultyEl.textContent = "";
+      quizActive = false;
     }
 
     function restartGame() {
-      questions = [...allQuestions];
+      questions = [...allQuestions].sort(() => 0.5 - Math.random());
       currentIndex = 0;
+      updateProgress();
+      quizActive = true;
       loadQuestion();
     }
 
