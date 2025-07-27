@@ -76,20 +76,7 @@
       color: #fff;
     }
 
-    .progress-bar-container {
-      background: #000;
-      border: 2px solid gold;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 20px;
-      width: 0%;
-      background: limegreen;
-      transition: width 0.5s ease;
-    }
+    /* Removed progress-bar-container and progress-bar styles */
 
     .question {
       font-size: 1.5em;
@@ -348,7 +335,6 @@
 
     <div class="container" id="game-container">
       <div class="game-container">
-        <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
         <div class="lifelines">
           <button class="lifeline-btn" onclick="use5050()" id="lifeline5050">50:50</button>
           </div>
@@ -401,11 +387,11 @@
     const optionsEl = document.getElementById("options");
     const timerEl = document.getElementById("timer");
     const difficultyEl = document.getElementById("difficulty");
-    const progressBar = document.getElementById("progress-bar");
+    // const progressBar = document.getElementById("progress-bar"); // Removed
     const soundCorrect = document.getElementById("soundCorrect");
     const soundWrong = document.getElementById("soundWrong");
     const soundQuestion = document.getElementById("soundQuestion");
-    const soundIntro = document.getElementById("soundIntro"); // Ensure this is correctly referenced
+    const soundIntro = document.getElementById("soundIntro");
 
     window.gameController = {
       showDollSeeingMessage: function() {
@@ -425,10 +411,10 @@
 
     // Define a function to start the doll animation (moved outside startGame for reusability)
     const startDollAnimation = () => {
-        questionEl.textContent = "Loading...";
+        questionEl.textContent = "Loading..."; // This will now display "Loading..." after rules
         optionsEl.innerHTML = "";
         if (window.dollController) {
-            window.dollController.playAction1();
+            window.dollController.playAction1(); // This already plays soundGreenLight inside dollController.playAction1()
         }
         waitingForDoll = true;
     };
@@ -439,11 +425,14 @@
       document.getElementById("game-container").style.display = "flex";
       restartGame(); // This will now handle the initial game setup
 
+      // Display "Rules" immediately when game starts and intro sound plays
+      questionEl.textContent = "🔊 Rules...";
+      optionsEl.innerHTML = ""; // Clear options while rules are playing
+
       if (soundIntro) {
         soundIntro.currentTime = 0; // Ensure it starts from the beginning
 
         // IMPORTANT: Remove any existing 'ended' listeners before adding a new one
-        // This prevents multiple listeners from accumulating on restart/repeated plays
         soundIntro.removeEventListener('ended', handleIntroEnded);
 
         // Add a named event listener for when the intro sound ends
@@ -451,7 +440,8 @@
             console.log("Intro audio ended. Waiting 3 seconds for doll animation.");
             // Remove the listener after it fires to prevent multiple calls
             soundIntro.removeEventListener('ended', handleIntroEnded);
-            // Wait 3 seconds after the audio ends before starting doll animation
+
+            // Wait 3 seconds after the audio ends before starting doll animation and Green Light
             setTimeout(startDollAnimation, 3000); // 3000 milliseconds = 3 seconds
         }
         soundIntro.addEventListener('ended', handleIntroEnded);
@@ -464,23 +454,17 @@
             .catch(error => {
                 console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
                 // Fallback: If audio fails to play, still proceed with the game after a short delay
-                // and skip waiting for audio to end
                 soundIntro.removeEventListener('ended', handleIntroEnded); // Remove listener if play fails
                 setTimeout(startDollAnimation, 1000); // Shorter fallback delay if audio fails
             });
       } else {
-          // Fallback if soundIntro element isn't found
           console.warn("soundIntro audio element not found. Proceeding without intro sound.");
           startDollAnimation(); // Directly start doll animation if no intro sound
       }
     }
 
 
-    function updateProgress() {
-      // Progress bar remains based on original length, will just show 100% after all unique questions
-      const percent = ((currentIndex) / allQuestions.length) * 100;
-      progressBar.style.width = percent + "%";
-    }
+    // Removed updateProgress() function as progress bar is removed
 
     function loadQuestion() {
       clearInterval(timer);
@@ -501,13 +485,12 @@
         if (timeLeft <= 0) endGame("⏱️ Time's up!"); // Still ends game on time out
       }, 1000);
 
-      updateProgress();
       difficultyEl.textContent = `🔎 Difficulty: ${q.d.charAt(0).toUpperCase() + q.d.slice(1)}`;
       questionEl.textContent = q.q;
       optionsEl.innerHTML = "";
 
       soundQuestion.currentTime = 0;
-      soundQuestion.play().catch(() => {}); // Ignore audio errors
+      soundQuestion.play().catch(() => {});
 
       q.a.forEach((option, i) => {
         const btn = document.createElement("button");
@@ -582,7 +565,7 @@
     function restartGame() {
       questions = [...allQuestions].sort(() => 0.5 - Math.random());
       currentIndex = 0;
-      updateProgress();
+      // Removed call to updateProgress();
       quizActive = true;
       waitingForDoll = false; // Reset this state
 
@@ -595,8 +578,14 @@
       document.getElementById("lifeline5050").disabled = false;
       document.getElementById("lifeline5050").style.display = ""; // Ensure it's visible
 
-      // Immediately start the doll animation for the first question
-      startDollAnimation();
+      // Start the doll animation (and thus green light) after the rules section (if starting fresh)
+      // or immediately if restarting after game has already begun past intro.
+      // The startGame function now handles the initial "Rules" text if this is the first start.
+      // If restartGame is called directly (e.g., from restart button), we want to go straight to doll animation.
+      if (document.getElementById("welcome-screen").style.display === "none") { // Check if game is already active
+          startDollAnimation(); // If already in game, directly start doll animation
+      }
+      // Otherwise, if this is called from startGame, startGame will handle the sequence with "Rules"
     }
 
     function quitGame() {
