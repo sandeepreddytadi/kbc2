@@ -686,7 +686,7 @@
   <audio id="soundWrong" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg" preload="auto"></audio>
   <audio id="soundGreenLight" src="audio/doll-green-light.mp3" preload="auto"></audio>
   <audio id="soundRedLight" src="audio/doll-red-light.mp3" preload="auto"></audio>
-  <audio id="soundWelcome" src="audio/squid-game-rules.mp3" preload="auto"></audio>
+  <audio id="soundIntro" src="audio/squid-game-rules.mp3" preload="auto"></audio>
 
 
   <script>
@@ -745,16 +745,47 @@
 
     const soundQuestion = document.getElementById("soundQuestion");
 
+    const soundIntro = document.getElementById("soundIntro"); // Get reference to the new intro audio
 
-window.onload = function() {
-  setTimeout(() => {
-    const welcomeAudio = document.getElementById("soundWelcome");
-    if (welcomeAudio) {
-      welcomeAudio.currentTime = 0;
-      welcomeAudio.play().catch(() => {});
+    // Make sounds globally accessible for dollController
+    window.soundGreenLight = soundGreenLight;
+    window.soundRedLight = soundRedLight;
+
+    // --- NEW CODE START ---
+    // Function to attempt playing the audio
+    function playIntroAudio() {
+        if (soundIntro) {
+            soundIntro.play()
+                .then(() => {
+                    console.log("Intro audio started playing.");
+                })
+                .catch(error => {
+                    console.warn("Autoplay of intro audio blocked. User interaction needed.", error);
+                    // Provide a fallback or instruction if autoplay is blocked
+                    // For example, you could show a "Play Sound" button
+                });
+        }
     }
-  }, 3000);
-};
+
+    // Play intro audio after 3 seconds when the page is fully loaded
+    window.addEventListener('load', () => {
+        setTimeout(playIntroAudio, 3000); // 3000 milliseconds = 3 seconds
+    });
+
+    // To help with autoplay policies:
+    // Some browsers require a user interaction with the document for any audio to play.
+    // By attempting to play a silent sound on *any* click, we can often "unlock" the audio context.
+    document.addEventListener('click', function() {
+        if (soundIntro && soundIntro.paused) { // Check if it's paused or never started
+            // Attempt to play it again (it might be silent for the user on first click, but unlocks context)
+            soundIntro.volume = 0; // Make it silent for this "unlock" attempt
+            soundIntro.play().then(() => {
+                soundIntro.volume = 1; // Reset volume for actual play calls
+            }).catch(e => {
+                // Ignore errors here, this is just to unlock
+            });
+        }
+    }, { once: true });
 
 
     window.gameController = {
