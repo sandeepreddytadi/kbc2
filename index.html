@@ -686,6 +686,7 @@
   <audio id="soundWrong" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg" preload="auto"></audio>
   <audio id="soundGreenLight" src="audio/doll-green-light.mp3" preload="auto"></audio>
   <audio id="soundRedLight" src="audio/doll-red-light.mp3" preload="auto"></audio>
+  <audio id="soundWelcome" src="audio/squid-game-rules.mp3" preload="auto"></audio>
 
 
   <script>
@@ -744,6 +745,16 @@
 
     const soundQuestion = document.getElementById("soundQuestion");
 
+
+window.onload = function() {
+  setTimeout(() => {
+    const audio = document.getElementById("soundWelcome");
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+  }, 3000);
+};
 
 
     window.gameController = {
