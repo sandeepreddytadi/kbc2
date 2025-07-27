@@ -2,107 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Rotate Head with If-Else Animations</title>
+  <title>Two Animation If-Else Trigger</title>
   <style>
-    body { margin: 0; }
+    body { margin: 0; overflow: hidden; }
     canvas { display: block; }
   </style>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
-        "GLTFLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js",
-        "OrbitControls": "https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js"
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
+    import { GLTFLoader } from 'https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js';
+
+    let scene, camera, renderer, mixer;
+    let actionTo180, actionTo0;
+
+    init();
+
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
+      camera.position.set(0, 1.5, 3);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+      light.position.set(0, 20, 0);
+      scene.add(light);
+
+      const loader = new GLTFLoader();
+      loader.load('doll.glb', (gltf) => {
+        const model = gltf.scene;
+        scene.add(model);
+
+        mixer = new THREE.AnimationMixer(model);
+
+        const animations = gltf.animations;
+
+        // Show all available animation names in console
+        const animNames = animations.map(a => a.name);
+        console.log('Available animations:', animNames);
+
+        // Find animations by name
+        const anim180 = animations.find(a => a.name === 'o to 18o degree');
+        const anim0 = animations.find(a => a.name === '18o to o degree');
+
+        if (!anim180 || !anim0) {
+          alert("Required animations not found. Available: " + animNames.join(", "));
+          return;
+        }
+
+        // Clip actions from valid animations
+        actionTo180 = mixer.clipAction(anim180);
+        actionTo0 = mixer.clipAction(anim0);
+
+        // Play default animation
+        actionTo0.play();
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = clock.getDelta();
+        if (mixer) mixer.update(delta);
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Keyboard trigger
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'r') {
+          playAnimation(true);   // 0 to 180
+        } else if (event.key === 'b') {
+          playAnimation(false);  // 180 to 0
+        }
+      });
+    }
+
+    function playAnimation(to180) {
+      if (!actionTo180 || !actionTo0) {
+        console.warn('Animation actions not ready.');
+        return;
+      }
+
+      // Stop both before playing selected one
+      actionTo180.stop();
+      actionTo0.stop();
+
+      if (to180) {
+        actionTo180.reset().fadeIn(0.2).play();
+      } else {
+        actionTo0.reset().fadeIn(0.2).play();
       }
     }
   </script>
 </head>
 <body>
-<script type="module">
-import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js';
-
-let scene, camera, renderer, mixer;
-let rotateTo180, rotateTo0;
-
-init();
-
-function init() {
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 1.5, 3);
-
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-  light.position.set(0, 20, 0);
-  scene.add(light);
-
-  const loader = new GLTFLoader();
-  loader.load('doll.glb', function (gltf) {
-    const model = gltf.scene;
-    scene.add(model);
-
-    mixer = new THREE.AnimationMixer(model);
-
-    const animations = gltf.animations;
-
-    rotateTo180 = mixer.clipAction(animations.find(a => a.name === 'o to 18o degree'));
-    rotateTo0   = mixer.clipAction(animations.find(a => a.name === '18o to o degree'));
-
-    rotateTo0.play(); // Default pose
-  });
-
-  const animNames = gltf.animations.map(a => a.name);
-console.log('Available animations:', animNames);
-
-const anim180 = gltf.animations.find(a => a.name === '0 to 180 degree');
-const anim0 = gltf.animations.find(a => a.name === '180 to 0 degree');
-
-if (!anim180 || !anim0) {
-  alert("Animations not found: " + animNames.join(", "));
-  return;
-}
-
-actionTo180 = mixer.clipAction(anim180);
-actionTo0 = mixer.clipAction(anim0);
-
-  const clock = new THREE.Clock();
-
-  function animate() {
-    requestAnimationFrame(animate);
-    const delta = clock.getDelta();
-    if (mixer) mixer.update(delta);
-    renderer.render(scene, camera);
-  }
-
-  animate();
-
-  // Trigger animation via key press
-  window.addEventListener('keydown', (event) => {
-    if (event.key === 'r') {
-      triggerRotation(true);  // Run 0 to 180
-    } else if (event.key === 'b') {
-      triggerRotation(false); // Run 180 to 0
-    }
-  });
-}
-
-function triggerRotation(to180) {
-  if (!rotateTo180 || !rotateTo0) return;
-
-  // Stop both before playing the desired one
-  rotateTo180.stop();
-  rotateTo0.stop();
-
-  if (to180) {
-    rotateTo180.reset().fadeIn(0.2).play();
-  } else {
-    rotateTo0.reset().fadeIn(0.2).play();
-  }
-}
-</script>
 </body>
 </html>
