@@ -1,578 +1,1055 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>KBC + GLB Model Background</title>
-  <style>
-    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+  <meta charset="UTF-8" />
+  <title>KBC + GLB Model Background</title>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
 
-    canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
+    canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
 
-    .quiz-container-wrapper {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 70%;
-      height: 100%;
-      background: transparent;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 30px 20px;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.4);
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-y: auto;
-    }
+    .quiz-container-wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 70%;
+      height: 100%;
+      background: transparent;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 30px 20px;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+    }
 
-    .container {
-      display: none;
-      flex-direction: row;
-      width: 95%;
-      max-width: 1200px;
-      gap: 20px;
-    }
+    .container {
+      display: none;
+      flex-direction: row;
+      width: 95%;
+      max-width: 1200px;
+      gap: 20px;
+    }
 
-    .welcome-screen {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      color: #fff;
-    }
+    .welcome-screen {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      color: #fff;
+    }
 
-    .welcome-logo {
-      font-size: 2em;
-      color: gold;
-    }
+    .welcome-logo {
+      font-size: 2em;
+      color: gold;
+    }
 
-    .start-btn {
-      background-color: gold;
-      color: black;
-      font-size: 1.2em;
-      font-weight: bold;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+    .start-btn {
+      background-color: gold;
+      color: black;
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-    .start-btn:hover {
-      background-color: #ffd700;
-    }
+    .start-btn:hover {
+      background-color: #ffd700;
+    }
 
-    .game-container {
-      background-color: rgba(0,0,0,0.6);
-      border-radius: 10px;
-      padding: 20px;
-      flex: 2;
-      box-shadow: 0 0 20px #ffd700;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #fff;
-    }
+    .game-container {
 
-    .progress-bar-container {
-      background: #000;
-      border: 2px solid gold;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
+      background-color: rgba(0,0,0,0.6);
 
-    .progress-bar {
-      height: 20px;
-      width: 0%;
-      background: limegreen;
-      transition: width 0.5s ease;
-    }
+      border-radius: 10px;
 
-    .question {
-      font-size: 1.5em;
-      padding: 15px;
-      margin-bottom: 20px;
-      border: 2px solid gold;
-      border-radius: 8px;
-      background-color: #002b5c;
-      color: silver;
-    }
+      padding: 20px;
 
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
+      flex: 2;
 
-    .option-btn {
-      background-color: #004080;
-      color: #ffffff;
-      border: 2px solid gold;
-      padding: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
+      box-shadow: 0 0 20px #ffd700;
 
-    .option-btn:hover {
-      background-color: #0059b3;
-    }
+      display: flex;
 
-    .option-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+      flex-direction: column;
 
-    .lifelines, .actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
+      justify-content: space-between;
 
-    .lifeline-btn, .action-btn {
-      background-color: gold;
-      color: black;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      flex: 1;
-      transition: background-color 0.3s ease;
-    }
+      color: #fff;
 
-    .lifeline-btn:hover, .action-btn:hover {
-      background-color: #ffd700;
-    }
+    }
 
-    .lifeline-btn:disabled {
-      background-color: gray;
-      cursor: not-allowed;
-    }
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 1.2em;
-      color: #ffd700;
-    }
 
-    .final-congrats {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      color: gold;
-      padding: 20px;
-    }
+    .progress-bar-container {
 
-    .final-badge {
-      font-size: 1.5em;
-      font-weight: bold;
-      background-color: gold;
-      color: black;
-      padding: 15px 30px;
-      border-radius: 12px;
-      border: 3px solid white;
-      margin-top: 20px;
-    }
-    
-    .instructions {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      color: #ffd700;
-      font-size: 0.9em;
-      z-index: 20;
-    }
-  </style>
+      background: #000;
 
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
-        "GLTFLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js",
-        "OrbitControls": "https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js"
-      }
-    }
-  </script>
+      border: 2px solid gold;
+
+      border-radius: 8px;
+
+      margin-bottom: 10px;
+
+      overflow: hidden;
+
+    }
+
+
+
+    .progress-bar {
+
+      height: 20px;
+
+      width: 0%;
+
+      background: limegreen;
+
+      transition: width 0.5s ease;
+
+    }
+
+
+
+    .question {
+
+      font-size: 1.5em;
+
+      padding: 15px;
+
+      margin-bottom: 20px;
+
+      border: 2px solid gold;
+
+      border-radius: 8px;
+
+      background-color: #002b5c;
+
+      color: silver;
+
+    }
+
+
+
+    .options {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 15px;
+
+      margin-bottom: 20px;
+
+    }
+
+
+
+    .option-btn {
+
+      background-color: #004080;
+
+      color: #ffffff;
+
+      border: 2px solid gold;
+
+      padding: 15px;
+
+      padding: 12px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-weight: bold;
+
+      transition: 0.3s;
+
+    }
+
+
+
+    .option-btn:hover {
+
+      background-color: #0059b3;
+
+    }
+
+
+
+    .option-btn:disabled {
+
+      opacity: 0.5;
+
+      cursor: not-allowed;
+
+    }
+
+
+
+    .lifelines, .actions {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 10px;
+
+      margin-bottom: 10px;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .lifeline-btn, .action-btn {
+
+      background-color: gold;
+
+      color: black;
+
+      font-weight: bold;
+
+      border: none;
+
+      border-radius: 8px;
+
+      padding: 8px 12px;
+
+      cursor: pointer;
+
+      flex: 1;
+
+      transition: background-color 0.3s ease;
+
+    }
+
+
+
+    .lifeline-btn:hover, .action-btn:hover {
+
+      background-color: #ffd700;
+
+    }
+
+
+
+    .lifeline-btn:disabled {
+
+      background-color: gray;
+
+      cursor: not-allowed;
+
+    }
+
+
+
+    .top-bar {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 10px;
+
+      font-size: 1.2em;
+
+      color: #ffd700;
+
+    }
+
+
+
+    .final-congrats {
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      text-align: center;
+
+      color: gold;
+
+      padding: 20px;
+
+    }
+
+
+
+    .final-badge {
+
+      font-size: 1.5em;
+
+      font-weight: bold;
+
+      background-color: gold;
+
+      color: black;
+
+      padding: 15px 30px;
+
+      border-radius: 12px;
+
+      border: 3px solid white;
+
+      margin-top: 20px;
+
+    }
+
+    
+
+    .instructions {
+
+      position: absolute;
+
+      bottom: 20px;
+
+      left: 20px;
+
+      color: #ffd700;
+
+      font-size: 0.9em;
+
+      z-index: 20;
+
+    }
+
+  </style>
+
+
+
+  <script type="importmap">
+
+    {
+
+      "imports": {
+
+        "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
+
+        "GLTFLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js",
+
+        "OrbitControls": "https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js"
+
+      }
+
+    }
+
+  </script>
+
 </head>
+
 <body>
-    <script type="module">
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'GLTFLoader';
-    import { OrbitControls } from 'OrbitControls';
 
-    let scene, camera, renderer, mixer, clock;
-    let action1, action2;
-    let dollAnimationState = 'idle'; // idle, animating, waiting
+  <!-- THREE.js animation background -->
 
-    window.dollController = {
-      playAction1: function() {
-        if (!mixer || !action1 || dollAnimationState === 'animating') return;
-        dollAnimationState = 'animating';
-        if (action2) action2.stop(); // Ensure action2 is stopped if it was playing
-        action1.reset();
-        action1.setLoop(THREE.LoopOnce);
-        action1.clampWhenFinished = true;
-        action1.play();
-        
-        // Play green light sound
-        if (window.soundGreenLight) {
-          window.soundGreenLight.currentTime = 0;
-          window.soundGreenLight.play().catch(() => {});
-        }
+  <script type="module">
 
-        // Listen for animation completion
-        mixer.addEventListener('finished', function onFinished(e) {
-          if (e.action === action1) {
-            dollAnimationState = 'waiting';
-            mixer.removeEventListener('finished', onFinished);
-          }
-        });
-      },
-      
-      playAction2: function() {
-        if (!mixer || !action2 || dollAnimationState === 'animating') return;
-        dollAnimationState = 'animating';
-        if (action1) action1.stop(); // Ensure action1 is stopped if it was playing
-        action2.reset();
-        action2.setLoop(THREE.LoopOnce);
-        action2.clampWhenFinished = true;
-        action2.play();
+    import * as THREE from 'three';
 
-        // Play red light sound
-        if (window.soundRedLight) {
-          window.soundRedLight.currentTime = 0;
-          window.soundRedLight.play().catch(() => {});
-        }
-        
-        // Listen for animation completion
-        mixer.addEventListener('finished', function onFinished(e) {
-          if (e.action === action2) {
-            dollAnimationState = 'idle';
-            mixer.removeEventListener('finished', onFinished);
-            // Trigger question load after 3 seconds
-            setTimeout(() => {
-              if (window.gameController) {
-                window.gameController.loadQuestionAfterDoll();
-              }
-            }, 3000);
-          }
-        });
-      },
-      
-      getState: function() {
-        return dollAnimationState;
-      }
-    };
+    import { GLTFLoader } from 'GLTFLoader';
 
-    init();
-    animate();
+    import { OrbitControls } from 'OrbitControls';
 
-    function init() {
-      clock = new THREE.Clock();
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x002F4F);
 
-      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 5, 20);
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
+    let scene, camera, renderer, mixer, clock;
 
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.target.set(0, 5, 0);
-      controls.update();
+    let action1, action2;
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(10, 20, 10);
-      scene.add(directionalLight);
+    let isAction1 = true;
 
-      const loader = new GLTFLoader();
-      loader.load('doll.glb', function (gltf) {
-        const model = gltf.scene;
-        scene.add(model);
+    let dollAnimationState = 'idle'; // idle, animating, waiting
 
-        const exportedCameras = gltf.cameras;
-        if (exportedCameras && exportedCameras.length > 0) {
-          camera = exportedCameras[0];
-        }
 
-        mixer = new THREE.AnimationMixer(model);
-        const animations = gltf.animations;
 
-        action1 = mixer.clipAction(animations.find(a => a.name === "o to 18o degree"));
-        action2 = mixer.clipAction(animations.find(a => a.name === "18o to o degree"));
-      }, undefined, function (error) {
-        console.log('GLB file not found, continuing without 3D model');
-      });
+    window.dollController = {
 
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+      playAction1: function() {
 
-      window.addEventListener('keydown', (event) => {
-        if (!mixer || !action1 || !action2) return;
-        if (event.key.toLowerCase() === 'r' && window.dollController.getState() === 'waiting') {
-          window.dollController.playAction2();
-          if (window.gameController) {
-            window.gameController.showDollSeeingMessage();
-          }
-        }
-      });
-    }
+        if (!mixer || !action1 || dollAnimationState === 'animating') return;
 
-    function animate() {
-      requestAnimationFrame(animate);
-      const delta = clock.getDelta();
-      if (mixer) mixer.update(delta);
-      renderer.render(scene, camera);
-    }
-  </script>
+        dollAnimationState = 'animating';
 
-    <div class="quiz-container-wrapper">
-    <div class="welcome-screen" id="welcome-screen">
-      <div class="welcome-logo">🌟 KBC - Gen AI & Tech Edition</div>
-      <button class="start-btn" onclick="startGame()">▶️ Start Game</button>
-    </div>
+        action2.stop();
 
-    <div class="container" id="game-container">
-      <div class="game-container">
-        <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
-        <div class="lifelines">
-          <button class="lifeline-btn" onclick="use5050()" id="lifeline5050">50:50</button>
-          <button class="lifeline-btn" onclick="usePhone()" id="lifelinePhone">Phone</button>
-          <button class="lifeline-btn" onclick="useAudience()" id="lifelineAudience">Audience</button>
-        </div>
-        <div class="top-bar">
-          <div id="difficulty">🔎 Difficulty: Easy</div>
-          <div id="timer">⏱️ 30s</div>
-        </div>
-        <div class="question" id="question">Loading...</div>
-        <div class="options" id="options"></div>
-        <div class="actions">
-          <button class="action-btn" onclick="restartGame()">🔁 Restart</button>
-          <button class="action-btn" onclick="quitGame()">🚪 Quit</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="instructions">
-    <div>Press 'R' when doll stops to make it turn back and see the question</div>
-  </div>
+        action1.reset();
 
-  <audio id="soundQuestion" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
-  <audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
-  <audio id="soundWrong" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg" preload="auto"></audio>
-  <audio id="soundGreenLight" src="audio/doll-green-light.mp3" preload="auto"></audio>
-  <audio id="soundRedLight" src="audio/doll-red-light.mp3" preload="auto"></audio>
+        action1.setLoop(THREE.LoopOnce);
 
-  <script>
-    const allQuestions = [
-      { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1, d: "easy" },
-      { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1, d: "easy" },
-      { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2, d: "medium" },
-      { q: "Purpose of GPU in AI?", a: ["Power", "Rendering", "Parallel processing", "Memory"], c: 2, d: "medium" },
-      { q: "Facebook AI framework?", a: ["Keras", "Theano", "PyTorch", "CNTK"], c: 2, d: "medium" },
-      { q: "NLP stands for?", a: ["Neural LP", "Natural Language Processing", "Net Language Python", "None"], c: 1, d: "easy" },
-      { q: "Image recognition model?", a: ["CNN", "RNN", "GAN", "MLP"], c: 0, d: "medium" },
-      { q: "Google's AI assistant?", a: ["Alexa", "Siri", "Google Assistant", "Bixby"], c: 2, d: "easy" },
-      { q: "Non ML type?", a: ["Supervised", "Reinforcement", "Sequential", "Unsupervised"], c: 2, d: "medium" },
-      { q: "Activation function use?", a: ["Normalize", "Overfit", "Initialize", "Non-linearity"], c: 3, d: "medium" },
-      { q: "BERT by?", a: ["IBM", "Google", "Meta", "Amazon"], c: 1, d: "medium" },
-      { q: "GAN stands for?", a: ["Graphical AI Network", "General Adv Network", "Generative Adversarial Network", "Generic AI Node"], c: 2, d: "medium" }
-    ];
+        action1.clampWhenFinished = true;
 
-    let questions, currentIndex = 0, timer, timeLeft = 30;
-    let quizActive = false;
-    let waitingForDoll = false;
+        action1.play();
 
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const timerEl = document.getElementById("timer");
-    const difficultyEl = document.getElementById("difficulty");
-    const progressBar = document.getElementById("progress-bar");
-    const soundCorrect = document.getElementById("soundCorrect");
-    const soundWrong = document.getElementById("soundWrong");
-    const soundQuestion = document.getElementById("soundQuestion");
-    const soundGreenLight = document.getElementById("soundGreenLight");
-    const soundRedLight = document.getElementById("soundRedLight");
+        
 
-    // Make sounds globally accessible for dollController
-    window.soundGreenLight = soundGreenLight;
-    window.soundRedLight = soundRedLight;
+        // Listen for animation completion
 
-    window.gameController = {
-      showDollSeeingMessage: function() {
-        questionEl.textContent = "🔍 Doll is seeing...";
-        optionsEl.innerHTML = "";
-        clearInterval(timer);
-        timerEl.textContent = "";
-      },
-      
-      loadQuestionAfterDoll: function() {
-        if (waitingForDoll) {
-          waitingForDoll = false;
-          loadQuestion();
-        }
-      }
-    };
+        mixer.addEventListener('finished', function onFinished(e) {
 
-    function startGame() {
-      document.getElementById("welcome-screen").style.display = "none";
-      document.getElementById("game-container").style.display = "flex";
-      restartGame();
-      quizActive = true;
-      
-      // Start with doll animation
-      questionEl.textContent = "Loading...";
-      optionsEl.innerHTML = "";
-      if (window.dollController) {
-        window.dollController.playAction1(); // This will play green light sound
-      }
-      waitingForDoll = true;
-    }
+          if (e.action === action1) {
 
-    function updateProgress() {
-      const percent = ((currentIndex) / allQuestions.length) * 100;
-      progressBar.style.width = percent + "%";
-    }
+            dollAnimationState = 'waiting';
 
-    function loadQuestion() {
-      clearInterval(timer);
-      if (currentIndex >= questions.length) {
-        // confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
-        questionEl.innerHTML = `<div class="final-congrats">
-          <h2>🎉 Congratulations!</h2>
-          <p>You've answered all questions!</p>
-          <div class="final-badge">🏆 Quiz Master!</div>
-        </div>`;
-        optionsEl.innerHTML = "";
-        timerEl.textContent = "";
-        difficultyEl.textContent = "";
-        document.querySelectorAll(".lifeline-btn").forEach(btn => btn.style.display = "none");
-        progressBar.style.width = "100%";
-        return;
-      }
+            mixer.removeEventListener('finished', onFinished);
 
-      const q = questions[currentIndex];
-      timeLeft = 30;
-      updateTimer();
-      timer = setInterval(() => {
-        timeLeft--;
-        updateTimer();
-        if (timeLeft <= 0) endGame("⏱️ Time's up!");
-      }, 1000);
+          }
 
-      updateProgress();
-      difficultyEl.textContent = `🔎 Difficulty: ${q.d.charAt(0).toUpperCase() + q.d.slice(1)}`;
-      questionEl.textContent = q.q;
-      optionsEl.innerHTML = "";
+        });
 
-      soundQuestion.currentTime = 0;
-      soundQuestion.play().catch(() => {}); // Ignore audio errors
+      },
 
-      q.a.forEach((option, i) => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.textContent = option;
-        btn.onclick = () => handleAnswer(i);
-        optionsEl.appendChild(btn);
-      });
-    }
+      
 
-    function handleAnswer(i) {
-      clearInterval(timer);
-      const correct = questions[currentIndex].c;
-      const btns = optionsEl.querySelectorAll("button");
-      btns.forEach((btn, index) => {
-        btn.disabled = true;
-        if (index === correct) {
-          btn.style.backgroundColor = "#28a745";
-        } else if (index === i) {
-          btn.style.backgroundColor = "#dc3545";
-        }
-      });
+      playAction2: function() {
 
-      if (i === correct) {
-        soundCorrect.currentTime = 0;
-        soundCorrect.play().catch(() => {});
-        currentIndex++;
-        
-        setTimeout(() => {
-          // Start doll animation for next question (green light)
-          questionEl.textContent = "Loading...";
-          optionsEl.innerHTML = "";
-          if (window.dollController) {
-            window.dollController.playAction1(); 
-          }
-          waitingForDoll = true;
-        }, 1500);
-      } else {
-        soundWrong.currentTime = 0;
-        soundWrong.play().catch(() => {});
-        setTimeout(() => endGame("❌ Wrong Answer!"), 1500);
-      }
-    }
+        if (!mixer || !action2 || dollAnimationState === 'animating') return;
 
-    function updateTimer() {
-      timerEl.textContent = `⏱️ ${timeLeft}s`;
-    }
+        dollAnimationState = 'animating';
 
-    function endGame(msg) {
-      clearInterval(timer);
-      questionEl.textContent = msg;
-      optionsEl.innerHTML = "";
-      timerEl.textContent = "";
-      difficultyEl.textContent = "";
-      quizActive = false;
-      waitingForDoll = false;
-    }
+        action1.stop();
 
-    function restartGame() {
-      questions = [...allQuestions].sort(() => 0.5 - Math.random());
-      currentIndex = 0;
-      updateProgress();
-      quizActive = true;
-      waitingForDoll = false;
-    }
+        action2.reset();
 
-    function quitGame() {
-      endGame("🚪 You quit the game.");
-    }
-    
-    // Placeholder lifeline functions
-    function use5050() {
-      document.getElementById("lifeline5050").disabled = true;
-      // Implementation for 50:50 lifeline
-    }
-    
-    function usePhone() {
-      document.getElementById("lifelinePhone").disabled = true;
-      // Implementation for phone lifeline
-    }
-    
-    function useAudience() {
-      document.getElementById("lifelineAudience").disabled = true;
-      // Implementation for audience lifeline
-    }
-  </script>
+        action2.setLoop(THREE.LoopOnce);
+
+        action2.clampWhenFinished = true;
+
+        action2.play();
+
+        
+
+        // Listen for animation completion
+
+        mixer.addEventListener('finished', function onFinished(e) {
+
+          if (e.action === action2) {
+
+            dollAnimationState = 'idle';
+
+            mixer.removeEventListener('finished', onFinished);
+
+            // Trigger question load after 3 seconds
+
+            setTimeout(() => {
+
+              if (window.gameController) {
+
+                window.gameController.loadQuestionAfterDoll();
+
+              }
+
+            }, 3000);
+
+          }
+
+        });
+
+      },
+
+      
+
+      getState: function() {
+
+        return dollAnimationState;
+
+      }
+
+    };
+
+
+
+    init();
+
+    animate();
+
+
+
+    function init() {
+
+      clock = new THREE.Clock();
+
+      scene = new THREE.Scene();
+
+      scene.background = new THREE.Color(0x002F4F);
+
+
+
+      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+      camera.position.set(0, 5, 20);
+
+
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      document.body.appendChild(renderer.domElement);
+
+
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+
+      controls.target.set(0, 5, 0);
+
+      controls.update();
+
+
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+
+      directionalLight.position.set(10, 20, 10);
+
+      scene.add(directionalLight);
+
+
+
+      const loader = new GLTFLoader();
+
+      loader.load('doll.glb', function (gltf) {
+
+        const model = gltf.scene;
+
+        scene.add(model);
+
+
+
+        const exportedCameras = gltf.cameras;
+
+        if (exportedCameras && exportedCameras.length > 0) {
+
+          camera = exportedCameras[0];
+
+        }
+
+
+
+        mixer = new THREE.AnimationMixer(model);
+
+        const animations = gltf.animations;
+
+
+
+        action1 = mixer.clipAction(animations.find(a => a.name === "o to 18o degree"));
+
+        action2 = mixer.clipAction(animations.find(a => a.name === "18o to o degree"));
+
+      }, undefined, function (error) {
+
+        console.log('GLB file not found, continuing without 3D model');
+
+      });
+
+
+
+      window.addEventListener('resize', () => {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+      });
+
+
+
+      window.addEventListener('keydown', (event) => {
+
+        if (!mixer || !action1 || !action2) return;
+
+        if (event.key.toLowerCase() === 'r' && dollAnimationState === 'waiting') {
+
+          window.dollController.playAction2();
+
+          if (window.gameController) {
+
+            window.gameController.showDollSeeingMessage();
+
+          }
+
+        }
+
+      });
+
+    }
+
+
+
+    function animate() {
+
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+
+      if (mixer) mixer.update(delta);
+
+      renderer.render(scene, camera);
+
+    }
+
+  </script>
+
+
+
+  <!-- Floating quiz UI -->
+
+  <div class="quiz-container-wrapper">
+
+    <div class="welcome-screen" id="welcome-screen">
+
+      <div class="welcome-logo">🌟 KBC - Gen AI & Tech Edition</div>
+
+      <button class="start-btn" onclick="startGame()">▶️ Start Game</button>
+
+    </div>
+
+
+
+    <div class="container" id="game-container">
+
+      <div class="game-container">
+
+        <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
+
+        <div class="lifelines">
+
+          <button class="lifeline-btn" onclick="use5050()" id="lifeline5050">50:50</button>
+
+          <button class="lifeline-btn" onclick="usePhone()" id="lifelinePhone">Phone</button>
+
+          <button class="lifeline-btn" onclick="useAudience()" id="lifelineAudience">Audience</button>
+
+        </div>
+
+        <div class="top-bar">
+
+          <div id="difficulty">🔎 Difficulty: Easy</div>
+
+          <div id="timer">⏱️ 30s</div>
+
+        </div>
+
+        <div class="question" id="question">Loading...</div>
+
+        <div class="options" id="options"></div>
+
+        <div class="actions">
+
+          <button class="action-btn" onclick="restartGame()">🔁 Restart</button>
+
+          <button class="action-btn" onclick="quitGame()">🚪 Quit</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  
+
+  <div class="instructions">
+
+    <div>Press 'R' when doll stops to make it turn back and see the question</div>
+
+  </div>
+
+
+
+  <audio id="soundQuestion" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+
+  <audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+
+  <audio id="soundWrong" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg" preload="auto"></audio>
+
+
+
+  <script>
+
+    const allQuestions = [
+
+      { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1, d: "easy" },
+
+      { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1, d: "easy" },
+
+      { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2, d: "medium" },
+
+      { q: "Purpose of GPU in AI?", a: ["Power", "Rendering", "Parallel processing", "Memory"], c: 2, d: "medium" },
+
+      { q: "Facebook AI framework?", a: ["Keras", "Theano", "PyTorch", "CNTK"], c: 2, d: "medium" },
+
+      { q: "NLP stands for?", a: ["Neural LP", "Natural Language Processing", "Net Language Python", "None"], c: 1, d: "easy" },
+
+      { q: "Image recognition model?", a: ["CNN", "RNN", "GAN", "MLP"], c: 0, d: "medium" },
+
+      { q: "Google's AI assistant?", a: ["Alexa", "Siri", "Google Assistant", "Bixby"], c: 2, d: "easy" },
+
+      { q: "Non ML type?", a: ["Supervised", "Reinforcement", "Sequential", "Unsupervised"], c: 2, d: "medium" },
+
+      { q: "Activation function use?", a: ["Normalize", "Overfit", "Initialize", "Non-linearity"], c: 3, d: "medium" },
+
+      { q: "BERT by?", a: ["IBM", "Google", "Meta", "Amazon"], c: 1, d: "medium" },
+
+      { q: "GAN stands for?", a: ["Graphical AI Network", "General Adv Network", "Generative Adversarial Network", "Generic AI Node"], c: 2, d: "medium" }
+
+    ];
+
+
+
+    let questions, currentIndex = 0, timer, timeLeft = 30;
+
+    let quizActive = false;
+
+    let waitingForDoll = false;
+
+
+
+    const questionEl = document.getElementById("question");
+
+    const optionsEl = document.getElementById("options");
+
+    const timerEl = document.getElementById("timer");
+
+    const difficultyEl = document.getElementById("difficulty");
+
+    const progressBar = document.getElementById("progress-bar");
+
+    const soundCorrect = document.getElementById("soundCorrect");
+
+    const soundWrong = document.getElementById("soundWrong");
+
+    const soundQuestion = document.getElementById("soundQuestion");
+
+
+
+    window.gameController = {
+
+      showDollSeeingMessage: function() {
+
+        questionEl.textContent = "🔍 Doll is seeing...";
+
+        optionsEl.innerHTML = "";
+
+        clearInterval(timer);
+
+        timerEl.textContent = "";
+
+      },
+
+      
+
+      loadQuestionAfterDoll: function() {
+
+        if (waitingForDoll) {
+
+          waitingForDoll = false;
+
+          loadQuestion();
+
+        }
+
+      }
+
+    };
+
+
+
+    function startGame() {
+
+      document.getElementById("welcome-screen").style.display = "none";
+
+      document.getElementById("game-container").style.display = "flex";
+
+      restartGame();
+
+      quizActive = true;
+
+      
+
+      // Start with doll animation
+
+      questionEl.textContent = "Loading...";
+
+      optionsEl.innerHTML = "";
+
+      if (window.dollController) {
+
+        window.dollController.playAction1();
+
+      }
+
+      waitingForDoll = true;
+
+    }
+
+
+
+    function updateProgress() {
+
+      const percent = ((currentIndex) / allQuestions.length) * 100;
+
+      progressBar.style.width = percent + "%";
+
+    }
+
+
+
+    function loadQuestion() {
+
+      clearInterval(timer);
+
+      if (currentIndex >= questions.length) {
+
+        // confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
+
+        questionEl.innerHTML = `<div class="final-congrats">
+
+          <h2>🎉 Congratulations!</h2>
+
+          <p>You've answered all questions!</p>
+
+          <div class="final-badge">🏆 Quiz Master!</div>
+
+        </div>`;
+
+        optionsEl.innerHTML = "";
+
+        timerEl.textContent = "";
+
+        difficultyEl.textContent = "";
+
+        document.querySelectorAll(".lifeline-btn").forEach(btn => btn.style.display = "none");
+
+        progressBar.style.width = "100%";
+
+        return;
+
+      }
+
+
+
+      const q = questions[currentIndex];
+
+      timeLeft = 30;
+
+      updateTimer();
+
+      timer = setInterval(() => {
+
+        timeLeft--;
+
+        updateTimer();
+
+        if (timeLeft <= 0) endGame("⏱️ Time's up!");
+
+      }, 1000);
+
+
+
+      updateProgress();
+
+      difficultyEl.textContent = `🔎 Difficulty: ${q.d.charAt(0).toUpperCase() + q.d.slice(1)}`;
+
+      questionEl.textContent = q.q;
+
+      optionsEl.innerHTML = "";
+
+
+
+      soundQuestion.currentTime = 0;
+
+      soundQuestion.play().catch(() => {}); // Ignore audio errors
+
+
+
+      q.a.forEach((option, i) => {
+
+        const btn = document.createElement("button");
+
+        btn.className = "option-btn";
+
+        btn.textContent = option;
+
+        btn.onclick = () => handleAnswer(i);
+
+        optionsEl.appendChild(btn);
+
+      });
+
+    }
+
+
+
+    function handleAnswer(i) {
+
+      clearInterval(timer);
+
+      const correct = questions[currentIndex].c;
+
+      const btns = optionsEl.querySelectorAll("button");
+
+      btns.forEach((btn, index) => {
+
+        btn.disabled = true;
+
+        if (index === correct) {
+
+          btn.style.backgroundColor = "#28a745";
+
+        } else if (index === i) {
+
+          btn.style.backgroundColor = "#dc3545";
+
+        }
+
+      });
+
+
+
+      if (i === correct) {
+
+        soundCorrect.currentTime = 0;
+
+        soundCorrect.play().catch(() => {});
+
+        currentIndex++;
+
+        
+
+        setTimeout(() => {
+
+          // Start doll animation for next question
+
+          questionEl.textContent = "Loading...";
+
+          optionsEl.innerHTML = "";
+
+          if (window.dollController) {
+
+            window.dollController.playAction1();
+
+          }
+
+          waitingForDoll = true;
+
+        }, 1500);
+
+      } else {
+
+        soundWrong.currentTime = 0;
+
+        soundWrong.play().catch(() => {});
+
+        setTimeout(() => endGame("❌ Wrong Answer!"), 1500);
+
+      }
+
+    }
+
+
+
+    function updateTimer() {
+
+      timerEl.textContent = `⏱️ ${timeLeft}s`;
+
+    }
+
+
+
+    function endGame(msg) {
+
+      clearInterval(timer);
+
+      questionEl.textContent = msg;
+
+      optionsEl.innerHTML = "";
+
+      timerEl.textContent = "";
+
+      difficultyEl.textContent = "";
+
+      quizActive = false;
+
+      waitingForDoll = false;
+
+    }
+
+
+
+    function restartGame() {
+
+      questions = [...allQuestions].sort(() => 0.5 - Math.random());
+
+      currentIndex = 0;
+
+      updateProgress();
+
+      quizActive = true;
+
+      waitingForDoll = false;
+
+    }
+
+
+
+    function quitGame() {
+
+      endGame("🚪 You quit the game.");
+
+    }
+
+    
+
+    // Placeholder lifeline functions
+
+    function use5050() {
+
+      document.getElementById("lifeline5050").disabled = true;
+
+      // Implementation for 50:50 lifeline
+
+    }
+
+    
+
+    function usePhone() {
+
+      document.getElementById("lifelinePhone").disabled = true;
+
+      // Implementation for phone lifeline
+
+    }
+
+    
+
+    function useAudience() {
+
+      document.getElementById("lifelineAudience").disabled = true;
+
+      // Implementation for audience lifeline
+
+    }
+
+  </script>
+
 </body>
+
 </html>
