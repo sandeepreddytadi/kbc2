@@ -748,10 +748,10 @@
 
 window.onload = function() {
   setTimeout(() => {
-    const audio = document.getElementById("soundWelcome");
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
+    const welcomeAudio = document.getElementById("soundWelcome");
+    if (welcomeAudio) {
+      welcomeAudio.currentTime = 0;
+      welcomeAudio.play().catch(() => {});
     }
   }, 3000);
 };
