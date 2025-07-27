@@ -599,34 +599,6 @@
 
     }
 
-    const quizContainerWrapper = document.getElementById("quiz-container-wrapper");
-
-document.body.addEventListener('touchend', (event) => {
-    // Check if the doll controller and actions are available
-    if (!window.dollController || !window.dollController.getState) return;
-
-    // Check if the doll is in the 'waiting' state
-    if (window.dollController.getState() === 'waiting') {
-        // Check if the touch event target is outside the quiz-container-wrapper
-        // This is a simple check; more complex UIs might need more sophisticated hit testing.
-        if (!quizContainerWrapper.contains(event.target)) {
-            // Check if the touch point is not within the quiz container's bounding box
-            const rect = quizContainerWrapper.getBoundingClientRect();
-            const x = event.changedTouches[0].clientX;
-            const y = event.changedTouches[0].clientY;
-
-            // If touch is outside the quiz container on the right side
-            // (assuming quiz-container-wrapper is on the right 70% as per your CSS)
-            if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-                window.dollController.playAction2();
-                if (window.gameController) {
-                    window.gameController.showDollSeeingMessage();
-                }
-            }
-        }
-    }
-});
-
     function animate() {
 
       requestAnimationFrame(animate);
@@ -1081,6 +1053,17 @@ document.body.addEventListener('touchend', (event) => {
       // Implementation for audience lifeline
 
     }
+
+        // Handle mobile touch (outside the quiz area)
+document.addEventListener("touchstart", function(event) {
+  const quizArea = document.querySelector('.quiz-container-wrapper');
+  if (!quizArea.contains(event.target) && window.dollController && window.dollController.getState() === 'waiting') {
+    window.dollController.playAction2();
+    if (window.gameController) {
+      window.gameController.showDollSeeingMessage();
+    }
+  }
+});
 
   </script>
 
