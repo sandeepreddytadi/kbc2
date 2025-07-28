@@ -581,88 +581,69 @@ window.addEventListener('touchend', (e) => {
       waitingForDoll = false;
     }
 
-    // `restartGame` function now simply calls `initializeGameForQuestion`
-    // It should ONLY be called by the "Restart" button.
-   function restartGame() {
-  // Stop all audio
-  soundIntro.pause();
-  soundRules.pause();
-  soundGreen.pause();
-  soundQuestion.pause();
-  soundCorrect.pause();
-  soundWrong.pause();
+   let isRotated = false; // tracks model rotation state
 
-  // Reset audio positions
-  soundIntro.currentTime = 0;
-  soundRules.currentTime = 0;
-  soundGreen.currentTime = 0;
-  soundQuestion.currentTime = 0;
-  soundCorrect.currentTime = 0;
-  soundWrong.currentTime = 0;
+// GLOBAL AUDIO REFERENCES
+const audios = [
+  document.getElementById("soundIntro"),
+  document.getElementById("soundCorrect"),
+  document.getElementById("soundWrong"),
+  document.getElementById("soundQuestion")
+];
 
-  // Reset variables
+function stopAllAudio() {
+  audios.forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
+
+function rotateTo(angle) {
+  // Replace this with your actual 3D model rotation logic
+  console.log("Rotating model to:", angle);
+  // Example: model.rotation.y = THREE.MathUtils.degToRad(angle);
+}
+
+function playGreenLight() {
+  // Play greenlight animation or sound
+  console.log("Playing green light animation");
+  // Example: mixer.clipAction(greenLightClip).play();
+}
+
+// ✅ RESTART BUTTON FUNCTION
+window.restartGame = function () {
+  stopAllAudio();
+
+  isRotated = false;
+  rotateTo(0); // Reset rotation
+  playGreenLight();
+
+  // Reset game logic here
   currentIndex = 0;
-  waitingForDoll = false;
-  waitingForNext = false;
+  isAnswering = false;
+  awaitingNext = false;
 
   // Clear UI
-  questionEl.textContent = "";
-  optionsEl.innerHTML = "";
+  document.querySelector(".question-box").innerText = "";
+  document.querySelector(".options").innerHTML = "";
 
-  // Show "Starting..." message
-  questionEl.textContent = "Starting...";
+  setTimeout(() => {
+    loadQuestion(currentIndex);
+  }, 1000);
+};
 
-  // Play green light sound
-  soundGreen.play().catch(() => {});
+// ✅ QUIT BUTTON FUNCTION
+window.quitGame = function () {
+  stopAllAudio();
 
-  // After green light ends, start doll animation and show first question
-  soundGreen.onended = () => {
-    if (window.dollController) {
-      window.dollController.playAction1();
-    }
-    waitingForDoll = true;
-  };
-}
-
-    function quitGame() {
-  // 🔇 Stop all audio
-  soundIntro.pause();
-  soundRules.pause();
-  soundGreen.pause();
-  soundQuestion.pause();
-  soundCorrect.pause();
-  soundWrong.pause();
-
-  soundIntro.currentTime = 0;
-  soundRules.currentTime = 0;
-  soundGreen.currentTime = 0;
-  soundQuestion.currentTime = 0;
-  soundCorrect.currentTime = 0;
-  soundWrong.currentTime = 0;
-
-  // 🧠 Stop quiz progression
-  waitingForNext = true;
-  waitingForDoll = false;
-
-  // 🌀 Animate reverse rotation if already rotated to 180°
-  if (window.dollController) {
-    const rotationY = window.dollController.model.rotation.y;
-
-    // If model is at or very close to 180 degrees (PI radians)
-    if (Math.abs(rotationY - Math.PI) < 0.1) {
-      // Reverse rotate back to 0°
-      gsap.to(window.dollController.model.rotation, {
-        y: 0,
-        duration: 1.2,
-        ease: "power2.inOut"
-      });
-    }
+  if (!isRotated) {
+    rotateTo(180); // rotate to 180°
+    isRotated = true;
+  } else {
+    rotateTo(0); // rotate back to 0°
+    isRotated = false;
   }
-
-  // 🧹 Clear quiz UI (optional)
-  questionEl.textContent = "Quit. Thank you for playing!";
-  optionsEl.innerHTML = "";
-}
+};
 
     // Handle mobile touch (outside the quiz area)
     document.addEventListener("touchstart", function(event) {
