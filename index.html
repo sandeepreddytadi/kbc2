@@ -584,7 +584,7 @@ window.addEventListener('touchend', (e) => {
 let waitingForNext = false;
 
 function stopAllAudio() {
-  [soundIntro, soundStart, soundGreenLight, soundCorrect, soundWrong, soundQuestion].forEach(sound => {
+  [soundIntro, soundRedLight, soundGreenLight, soundCorrect, soundWrong, soundQuestion].forEach(sound => {
     if (sound) {
       sound.pause();
       sound.currentTime = 0;
