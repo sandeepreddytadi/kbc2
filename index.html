@@ -581,6 +581,13 @@ window.addEventListener('touchend', (e) => {
       waitingForDoll = false;
     }
 
+    const actionName1 = "o to 18o degree";
+const actionName2 = "18o to o degree";
+
+action1 = mixer.clipAction(animations.find(a => a.name === actionName1));
+action2 = mixer.clipAction(animations.find(a => a.name === actionName2));
+
+
 let waitingForNext = false;
 
 function stopAllAudio() {
