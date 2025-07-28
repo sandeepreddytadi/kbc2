@@ -597,10 +597,6 @@ soundDollIdleLoop.currentTime = 0;
 soundDollIdleLoop.pause();
 soundDollIdleLoop.currentTime = 0;
 
-      const redLightAudio = document.getElementById('soundRedLight');
-  const originalSrc = redLightAudio.src;
-  redLightAudio.src = '';
-
       if (window.dollController.getState() === 'waiting') {
   window.dollController.playAction2(); // Play 180 to 0 only if currently at 180
 }
