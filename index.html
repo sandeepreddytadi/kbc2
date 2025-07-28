@@ -594,27 +594,9 @@ soundDollIdleLoop.currentTime = 0;
     }
 
     function quitGame() {
-  const dollState = window.dollController?.getState?.();
-
-  // If doll is not already in 'waiting' state (i.e., not at 180 position), play action1 first
-  if (dollState !== 'waiting') {
-    // Listen for doll animation completion before quitting
-    const onFinishedQuit = (e) => {
-      if (e.action === action1) {
-        mixer.removeEventListener('finished', onFinishedQuit);
-        finalizeQuit();
-      }
-    };
-    mixer.addEventListener('finished', onFinishedQuit);
-
-    // Play the "0 to 180 degree" action if not already playing
-    window.dollController?.playAction1?.();
-  } else {
-    finalizeQuit(); // If already in waiting state, quit immediately
-  }
-}
-
-function finalizeQuit() {
+soundDollIdleLoop.pause();
+soundDollIdleLoop.currentTime = 0;
+      
   clearInterval(timer);
   questionEl.textContent = "🚪 You quit the game.";
   optionsEl.innerHTML = "";
