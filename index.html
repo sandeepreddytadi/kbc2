@@ -595,47 +595,43 @@ function stopAllAudio() {
 window.restartGame = function () {
   stopAllAudio();
 
-  // Reset index and game state
+  // Reset animations to start from 180
+  if (action1) {
+    action2?.stop(); // stop the reverse rotation if it's playing
+    action1.reset().play(); // play o to 180o
+  }
+
+  // Reset question index, UI, etc.
   currentIndex = 0;
-  waitingForNext = false;
+  score = 0;
+  updateScoreUI();
+  loadQuestion(currentIndex); // re-load the first question
 
-  // Reset visuals
-  const questionEl = document.getElementById("question");
-  const optionsEl = document.getElementById("options");
-  if (questionEl && optionsEl) {
-    questionEl.innerText = "Loading...";
-    optionsEl.innerHTML = "";
-  }
-
-  // Start from green light
-  if (window.dollController) {
-    window.dollController.rotateTo(0); // Rotate back to 0
-  }
-
-  // Trigger green light sound and animation
+  // Play greenlight audio
   soundGreenLight.currentTime = 0;
-  soundGreenLight.play().catch(() => {});
+  soundGreenLight.play();
 
-  waitingForDoll = true; // Wait for animation
+  // Reset UI texts
+  document.getElementById("question").innerText = "";
+  document.getElementById("options").innerHTML = "";
+
+  waitingForNext = false;
 };
 
 window.quitGame = function () {
   stopAllAudio();
 
-  // Rotate to 180 (exit pose)
-  if (window.dollController) {
-    window.dollController.rotateTo(180); // Custom function to rotate
+  // Play reverse animation 180 to 0
+  if (action2) {
+    action1?.stop(); // stop forward rotation if it's playing
+    action2.reset().play();
   }
 
-  // Optionally clear content or show a "Thanks" message
-  const questionEl = document.getElementById("question");
-  const optionsEl = document.getElementById("options");
-  if (questionEl && optionsEl) {
-    questionEl.innerText = "Thank you for playing!";
-    optionsEl.innerHTML = "";
-  }
+  // Clear UI
+  document.getElementById("question").innerText = "Game Ended.";
+  document.getElementById("options").innerHTML = "";
 
-  waitingForNext = false;
+  waitingForNext = true;
 };
 
     // Handle mobile touch (outside the quiz area)
