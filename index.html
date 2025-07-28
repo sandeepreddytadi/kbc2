@@ -583,15 +583,86 @@ window.addEventListener('touchend', (e) => {
 
     // `restartGame` function now simply calls `initializeGameForQuestion`
     // It should ONLY be called by the "Restart" button.
-    function restartGame() {
-        // This will set up the game questions, reset state, and start the doll.
-        // It does NOT replay the intro sound.
-        initializeGameForQuestion();
+   function restartGame() {
+  // Stop all audio
+  soundIntro.pause();
+  soundRules.pause();
+  soundGreen.pause();
+  soundQuestion.pause();
+  soundCorrect.pause();
+  soundWrong.pause();
+
+  // Reset audio positions
+  soundIntro.currentTime = 0;
+  soundRules.currentTime = 0;
+  soundGreen.currentTime = 0;
+  soundQuestion.currentTime = 0;
+  soundCorrect.currentTime = 0;
+  soundWrong.currentTime = 0;
+
+  // Reset variables
+  currentIndex = 0;
+  waitingForDoll = false;
+  waitingForNext = false;
+
+  // Clear UI
+  questionEl.textContent = "";
+  optionsEl.innerHTML = "";
+
+  // Show "Starting..." message
+  questionEl.textContent = "Starting...";
+
+  // Play green light sound
+  soundGreen.play().catch(() => {});
+
+  // After green light ends, start doll animation and show first question
+  soundGreen.onended = () => {
+    if (window.dollController) {
+      window.dollController.playAction1();
     }
+    waitingForDoll = true;
+  };
+}
 
     function quitGame() {
-      endGame("🚪 You quit the game.");
+  // 🔇 Stop all audio
+  soundIntro.pause();
+  soundRules.pause();
+  soundGreen.pause();
+  soundQuestion.pause();
+  soundCorrect.pause();
+  soundWrong.pause();
+
+  soundIntro.currentTime = 0;
+  soundRules.currentTime = 0;
+  soundGreen.currentTime = 0;
+  soundQuestion.currentTime = 0;
+  soundCorrect.currentTime = 0;
+  soundWrong.currentTime = 0;
+
+  // 🧠 Stop quiz progression
+  waitingForNext = true;
+  waitingForDoll = false;
+
+  // 🌀 Animate reverse rotation if already rotated to 180°
+  if (window.dollController) {
+    const rotationY = window.dollController.model.rotation.y;
+
+    // If model is at or very close to 180 degrees (PI radians)
+    if (Math.abs(rotationY - Math.PI) < 0.1) {
+      // Reverse rotate back to 0°
+      gsap.to(window.dollController.model.rotation, {
+        y: 0,
+        duration: 1.2,
+        ease: "power2.inOut"
+      });
     }
+  }
+
+  // 🧹 Clear quiz UI (optional)
+  questionEl.textContent = "Quit. Thank you for playing!";
+  optionsEl.innerHTML = "";
+}
 
     // Handle mobile touch (outside the quiz area)
     document.addEventListener("touchstart", function(event) {
