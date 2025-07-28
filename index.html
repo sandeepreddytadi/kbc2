@@ -581,68 +581,61 @@ window.addEventListener('touchend', (e) => {
       waitingForDoll = false;
     }
 
-   let isRotated = false; // tracks model rotation state
-
-// GLOBAL AUDIO REFERENCES
-const audios = [
-  document.getElementById("soundIntro"),
-  document.getElementById("soundCorrect"),
-  document.getElementById("soundWrong"),
-  document.getElementById("soundQuestion")
-];
+let waitingForNext = false;
 
 function stopAllAudio() {
-  audios.forEach(audio => {
-    audio.pause();
-    audio.currentTime = 0;
+  [soundIntro, soundRules, soundStart, soundGreenLight, soundCorrect, soundWrong, soundQuestion].forEach(sound => {
+    if (sound) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
   });
 }
 
-function rotateTo(angle) {
-  // Replace this with your actual 3D model rotation logic
-  console.log("Rotating model to:", angle);
-  // Example: model.rotation.y = THREE.MathUtils.degToRad(angle);
-}
-
-function playGreenLight() {
-  // Play greenlight animation or sound
-  console.log("Playing green light animation");
-  // Example: mixer.clipAction(greenLightClip).play();
-}
-
-// ✅ RESTART BUTTON FUNCTION
 window.restartGame = function () {
   stopAllAudio();
 
-  isRotated = false;
-  rotateTo(0); // Reset rotation
-  playGreenLight();
-
-  // Reset game logic here
+  // Reset index and game state
   currentIndex = 0;
-  isAnswering = false;
-  awaitingNext = false;
+  waitingForNext = false;
 
-  // Clear UI
-  document.querySelector(".question-box").innerText = "";
-  document.querySelector(".options").innerHTML = "";
+  // Reset visuals
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  if (questionEl && optionsEl) {
+    questionEl.innerText = "Loading...";
+    optionsEl.innerHTML = "";
+  }
 
-  setTimeout(() => {
-    loadQuestion(currentIndex);
-  }, 1000);
+  // Start from green light
+  if (window.dollController) {
+    window.dollController.rotateTo(0); // Rotate back to 0
+  }
+
+  // Trigger green light sound and animation
+  soundGreenLight.currentTime = 0;
+  soundGreenLight.play().catch(() => {});
+
+  waitingForDoll = true; // Wait for animation
 };
 
-// ✅ QUIT BUTTON FUNCTION
 window.quitGame = function () {
   stopAllAudio();
 
-  if (!isRotated) {
-    rotateTo(180); // rotate to 180°
-    isRotated = true;
-  } else {
-    rotateTo(0); // rotate back to 0°
-    isRotated = false;
+  // Rotate to 180 (exit pose)
+  if (window.dollController) {
+    window.dollController.rotateTo(180); // Custom function to rotate
   }
+
+  // Optionally clear content or show a "Thanks" message
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  if (questionEl && optionsEl) {
+    questionEl.innerText = "Thank you for playing!";
+    optionsEl.innerHTML = "";
+  }
+
+  waitingForNext = false;
 };
 
     // Handle mobile touch (outside the quiz area)
