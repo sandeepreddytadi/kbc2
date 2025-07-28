@@ -1,638 +1,466 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>KBC + GLB Model Background</title>
-  <style>
-    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+    <meta charset="UTF-8" />
+    <title>KBC + GLB Model Background</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif; /* Changed font to Orbitron */
+            background-color: #002F4F; /* Set a background color since 3D model is removed */
+        }
 
-    canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
+        /* Removed canvas styles as 3D model is removed */
 
-    .quiz-container-wrapper {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 70%;
-      height: 100%;
-      background: transparent;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 30px 20px;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.4);
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-y: auto;
-    }
+        .quiz-container-wrapper {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 70%;
+            height: 100%;
+            background: transparent;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
 
-    .container {
-      display: none;
-      flex-direction: row;
-      width: 95%;
-      max-width: 1200px;
-      gap: 20px;
-    }
+        .container {
+            display: none;
+            flex-direction: row;
+            width: 95%;
+            max-width: 1200px;
+            gap: 20px;
+        }
 
-    .welcome-screen {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      color: #fff;
-    }
+        .welcome-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            color: #fff;
+        }
 
-    .welcome-logo {
-      font-size: 2em;
-      color: gold;
-    }
+        .welcome-logo {
+            font-size: 2em;
+            color: gold;
+        }
 
-    .start-btn {
-      background-color: gold;
-      color: black;
-      font-size: 1.2em;
-      font-weight: bold;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+        .start-btn {
+            background-color: gold;
+            color: black;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Orbitron', sans-serif; /* Applied Orbitron to button */
+        }
 
-    .start-btn:hover {
-      background-color: #ffd700;
-    }
+        .start-btn:hover {
+            background-color: #ffd700;
+        }
 
-    .game-container {
-      background-color: rgba(0,0,0,0.6);
-      border-radius: 10px;
-      padding: 20px;
-      flex: 2;
-      box-shadow: 0 0 20px #ffd700;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #fff;
-    }
+        .game-container {
+            background-color: rgba(0,0,0,0.6);
+            border-radius: 10px;
+            padding: 20px;
+            flex: 2;
+            box-shadow: 0 0 20px #ffd700;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+        }
 
-    /* Removed progress-bar-container and progress-bar styles */
+        .question {
+            font-size: 1.5em;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid gold;
+            border-radius: 8px;
+            background-color: #002b5c;
+            color: silver;
+        }
 
-    .question {
-      font-size: 1.5em;
-      padding: 15px;
-      margin-bottom: 20px;
-      border: 2px solid gold;
-      border-radius: 8px;
-      background-color: #002b5c;
-      color: silver;
-    }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
+        .option-btn {
+            background-color: #004080;
+            color: #ffffff;
+            border: 2px solid gold;
+            padding: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-family: 'Orbitron', sans-serif; /* Applied Orbitron to button */
+        }
 
-    .option-btn {
-      background-color: #004080;
-      color: #ffffff;
-      border: 2px solid gold;
-      padding: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
+        .option-btn:hover {
+            background-color: #0059b3;
+        }
 
-    .option-btn:hover {
-      background-color: #0059b3;
-    }
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-    .option-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
 
-    .lifelines, .actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
+        .action-btn {
+            background-color: gold;
+            color: black;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            flex: 1;
+            transition: background-color 0.3s ease;
+            font-family: 'Orbitron', sans-serif; /* Applied Orbitron to button */
+        }
 
-    .lifeline-btn, .action-btn {
-      background-color: gold;
-      color: black;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      flex: 1;
-      transition: background-color 0.3s ease;
-    }
+        .action-btn:hover {
+            background-color: #ffd700;
+        }
 
-    .lifeline-btn:hover, .action-btn:hover {
-      background-color: #ffd700;
-    }
+        .action-btn:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
 
-    .lifeline-btn:disabled {
-      background-color: gray;
-      cursor: not-allowed;
-    }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #ffd700;
+        }
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 1.2em;
-      color: #ffd700;
-    }
+        .final-congrats {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: gold;
+            padding: 20px;
+        }
 
-    .final-congrats {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      color: gold;
-      padding: 20px;
-    }
+        .final-badge {
+            font-size: 1.5em;
+            font-weight: bold;
+            background-color: gold;
+            color: black;
+            padding: 15px 30px;
+            border-radius: 12px;
+            border: 3px solid white;
+            margin-top: 20px;
+        }
 
-    .final-badge {
-      font-size: 1.5em;
-      font-weight: bold;
-      background-color: gold;
-      color: black;
-      padding: 15px 30px;
-      border-radius: 12px;
-      border: 3px solid white;
-      margin-top: 20px;
-    }
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #ffd700;
+            font-size: 0.9em;
+            z-index: 20;
+        }
+    </style>
 
-    .instructions {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      color: #ffd700;
-      font-size: 0.9em;
-      z-index: 20;
-    }
-  </style>
-
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
-        "GLTFLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js",
-        "OrbitControls": "https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js"
-      }
-    }
-  </script>
+    <!-- Removed importmap for Three.js as 3D model is no longer used -->
 </head>
 <body>
 
-  <script type="module">
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'GLTFLoader';
-    import { OrbitControls } from 'OrbitControls';
+    <!-- Removed Three.js script block as 3D model is no longer used -->
 
-    let scene, camera, renderer, mixer, clock;
-    let action1, action2;
-    let dollAnimationState = 'idle'; // idle, animating, waiting
+    <div class="quiz-container-wrapper">
+        <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-logo">🌟 KBC - Gen AI & Tech Edition</div>
+            <button class="start-btn" onclick="startGame()">▶️ Start Game</button>
+        </div>
 
-    window.dollController = {
-      playAction1: function() {
-        if (!mixer || !action1 || dollAnimationState === 'animating') return;
-        dollAnimationState = 'animating';
-        if (action2) action2.stop();
-        action1.reset();
-        action1.setLoop(THREE.LoopOnce);
-        action1.clampWhenFinished = true;
-        action1.play();
-        // Play green light sound
-        if (window.soundGreenLight) {
-          window.soundGreenLight.currentTime = 0;
-          window.soundGreenLight.play().catch(() => {});
-        }
-        // Listen for animation completion
-        mixer.addEventListener('finished', function onFinished(e) {
-          if (e.action === action1) {
-  dollAnimationState = 'waiting';
-  mixer.removeEventListener('finished', onFinished);
-  // Start looping idle sound
-  if (window.soundDollIdleLoop) {
-    window.soundDollIdleLoop.currentTime = 0;
-    window.soundDollIdleLoop.play().catch(() => {});
-  }
-}
-        });
-      },
-      playAction2: function() {
-        if (!mixer || !action2 || dollAnimationState === 'animating') return;
-        dollAnimationState = 'animating';
-        if (action1) action1.stop();
-        action2.reset();
-        action2.setLoop(THREE.LoopOnce);
-        action2.clampWhenFinished = true;
-        action2.play();
-        // Stop idle loop sound before red light
-if (window.soundDollIdleLoop) {
-  window.soundDollIdleLoop.pause();
-  window.soundDollIdleLoop.currentTime = 0;
-}
-        // Play red light sound
-        if (window.soundRedLight) {
-          window.soundRedLight.currentTime = 0;
-          window.soundRedLight.play().catch(() => {});
-        }
-        // Listen for animation completion
-        mixer.addEventListener('finished', function onFinished(e) {
-          if (e.action === action2) {
-            dollAnimationState = 'idle';
-            mixer.removeEventListener('finished', onFinished);
-            // Trigger question load after 3 seconds
-            setTimeout(() => {
-              if (window.gameController) {
-                window.gameController.loadQuestionAfterDoll();
-              }
-            }, 3000);
-          }
-        });
-      },
-      getState: function() {
-        return dollAnimationState;
-      }
-    };
-
-    init();
-    animate();
-
-    function init() {
-      clock = new THREE.Clock();
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x002F4F);
-
-      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 5, 20);
-
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.target.set(0, 5, 0);
-      controls.update();
-
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(10, 20, 10);
-      scene.add(directionalLight);
-
-      const loader = new GLTFLoader();
-      loader.load('doll.glb', function (gltf) {
-        const model = gltf.scene;
-        scene.add(model);
-
-        const exportedCameras = gltf.cameras;
-        if (exportedCameras && exportedCameras.length > 0) {
-          camera = exportedCameras[0];
-        }
-
-        mixer = new THREE.AnimationMixer(model);
-        const animations = gltf.animations;
-
-        action1 = mixer.clipAction(animations.find(a => a.name === "o to 18o degree"));
-        action2 = mixer.clipAction(animations.find(a => a.name === "18o to o degree"));
-      }, undefined, function (error) {
-        console.log('GLB file not found, continuing without 3D model');
-      });
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-
-      window.addEventListener('keydown', (event) => {
-        if (!mixer || !action1 || !action2) return;
-        if (event.key.toLowerCase() === 'r' && dollAnimationState === 'waiting') {
-          window.dollController.playAction2();
-          if (window.gameController) {
-            window.gameController.showDollSeeingMessage();
-          }
-        }
-      });
-    }
-    function animate() {
-      requestAnimationFrame(animate);
-      const delta = clock.getDelta();
-      if (mixer) mixer.update(delta);
-      renderer.render(scene, camera);
-    }
-  </script>
-
-  <div class="quiz-container-wrapper">
-    <div class="welcome-screen" id="welcome-screen">
-      <div class="welcome-logo">🌟 KBC - Gen AI & Tech Edition</div>
-      <button class="start-btn" onclick="startGame()">▶️ Start Game</button>
+        <div class="container" id="game-container">
+            <div class="game-container">
+                <div class="top-bar">
+                    <div id="timer">⏱️ 30s</div>
+                </div>
+                <div class="question" id="question">Loading...</div>
+                <div class="options" id="options"></div>
+                <div class="actions">
+                    <button class="action-btn" onclick="restartGame()">🔁 Restart</button>
+                    <button class="action-btn" onclick="quitGame()">🚪 Quit</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="container" id="game-container">
-      <div class="game-container">
-        <div class="lifelines">
-          <button class="lifeline-btn" onclick="use5050()" id="lifeline5050">50:50</button>
-          </div>
-        <div class="top-bar">
-          <div id="difficulty">🔎 Difficulty: Easy</div>
-          <div id="timer">⏱️ 30s</div>
-        </div>
-        <div class="question" id="question">Loading...</div>
-        <div class="options" id="options"></div>
-        <div class="actions">
-          <button class="action-btn" onclick="restartGame()">🔁 Restart</button>
-          <button class="action-btn" onclick="quitGame()">🚪 Quit</button>
-        </div>
-      </div>
+    <div class="instructions">
+        <div>If you are using PC/Laptop:</div>
+        <div>Press 'N' after answering a question to proceed to the next one.</div>
+        <div>If you are using mobile:</div>
+        <div>Tap the 'Next Question' area (where the question would be) after answering to proceed.</div>
     </div>
-  </div>
 
-  <div class="instructions">
-    <div>If you are using PC/Laptop Press 'R' when doll stops to make it turn back and see the question<br>If you are using mobile tap on Doll, when doll stops to make it turn back and see the question</div>
-  </div>
+    <!-- Audio elements -->
+    <audio id="soundQuestion" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+    <audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+    <audio id="soundWrong" src="audio/squid-game-gunshot.mp3" preload="auto"></audio>
+    <!-- Removed doll-specific audio elements -->
+    <audio id="soundIntro" src="audio/squid-game-rules.mp3" preload="auto"></audio>
 
-  <audio id="soundQuestion" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
-  <audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
-  <audio id="soundWrong" src="audio/squid-game-gunshot.mp3" preload="auto"></audio>
-  <audio id="soundGreenLight" src="audio/doll-green-light.mp3" preload="auto"></audio>
-  <audio id="soundRedLight" src="audio/doll-red-light.mp3" preload="auto"></audio>
-  <audio id="soundIntro" src="audio/squid-game-rules.mp3" preload="auto"></audio>
-  <audio id="soundDollIdleLoop" src="audio/squid-game.mp3" preload="auto" loop></audio>
+    <script>
+        // Array of questions for the quiz
+        const allQuestions = [
+            { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1 },
+            { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1 },
+            { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2 },
+            { q: "Purpose of GPU in AI?", a: ["Power", "Rendering", "Parallel processing", "Memory"], c: 2 },
+            { q: "Facebook AI framework?", a: ["Keras", "Theano", "PyTorch", "CNTK"], c: 2 },
+            { q: "NLP stands for?", a: ["Neural LP", "Natural Language Processing", "Net Language Python", "None"], c: 1 },
+            { q: "Image recognition model?", a: ["CNN", "RNN", "GAN", "MLP"], c: 0 },
+            { q: "Google's AI assistant?", a: ["Alexa", "Siri", "Google Assistant", "Bixby"], c: 2 },
+            { q: "Non ML type?", a: ["Supervised", "Reinforcement", "Sequential", "Unsupervised"], c: 2 },
+            { q: "Activation function use?", a: ["Normalize", "Overfit", "Initialize", "Non-linearity"], c: 3 },
+            { q: "BERT by?", a: ["IBM", "Google", "Meta", "Amazon"], c: 1 },
+            { q: "GAN stands for?", a: ["Graphical AI Network", "General Adv Network", "Generative Adversarial Network", "Generic AI Node"], c: 2 }
+        ];
 
-  <script>
-    const allQuestions = [
-      { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1, d: "easy" },
-      { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1, d: "easy" },
-      { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2, d: "medium" },
-      { q: "Purpose of GPU in AI?", a: ["Power", "Rendering", "Parallel processing", "Memory"], c: 2, d: "medium" },
-      { q: "Facebook AI framework?", a: ["Keras", "Theano", "PyTorch", "CNTK"], c: 2, d: "medium" },
-      { q: "NLP stands for?", a: ["Neural LP", "Natural Language Processing", "Net Language Python", "None"], c: 1, d: "easy" },
-      { q: "Image recognition model?", a: ["CNN", "RNN", "GAN", "MLP"], c: 0, d: "medium" },
-      { q: "Google's AI assistant?", a: ["Alexa", "Siri", "Google Assistant", "Bixby"], c: 2, d: "easy" },
-      { q: "Non ML type?", a: ["Supervised", "Reinforcement", "Sequential", "Unsupervised"], c: 2, d: "medium" },
-      { q: "Activation function use?", a: ["Normalize", "Overfit", "Initialize", "Non-linearity"], c: 3, d: "medium" },
-      { q: "BERT by?", a: ["IBM", "Google", "Meta", "Amazon"], c: 1, d: "medium" },
-      { q: "GAN stands for?", a: ["Graphical AI Network", "General Adv Network", "Generative Adversarial Network", "Generic AI Node"], c: 2, d: "medium" }
-    ];
+        let questions, currentIndex = 0, timer, timeLeft = 30;
+        let quizActive = false;
+        let waitingForNextQuestionNKey = false; // Flag for waiting for 'N' key after an answer
 
-    let questions, currentIndex = 0, timer, timeLeft = 30;
-    let quizActive = false;
-    let waitingForDoll = false;
+        // DOM elements
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const timerEl = document.getElementById("timer");
+        const soundCorrect = document.getElementById("soundCorrect");
+        const soundWrong = document.getElementById("soundWrong");
+        const soundQuestion = document.getElementById("soundQuestion");
+        const soundIntro = document.getElementById("soundIntro");
 
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const timerEl = document.getElementById("timer");
-    const difficultyEl = document.getElementById("difficulty");
-    const soundCorrect = document.getElementById("soundCorrect");
-    const soundWrong = document.getElementById("soundWrong");
-    const soundQuestion = document.getElementById("soundQuestion");
-    const soundIntro = document.getElementById("soundIntro");
+        // Global game controller, accessible by other parts if needed (simplified)
+        window.gameController = {
+            // Displays a message indicating the doll is turning (now just a placeholder message)
+            showDollSeeingMessage: function() {
+                questionEl.textContent = "Get ready for the question...";
+                optionsEl.innerHTML = "";
+                clearInterval(timer); // Stop any active timer
+                timerEl.textContent = "";
+            },
 
-    window.gameController = {
-      showDollSeeingMessage: function() {
-        questionEl.textContent = "🔍 Doll is seeing...";
-        optionsEl.innerHTML = "";
-        clearInterval(timer);
-        timerEl.textContent = "";
-      },
+            // Loads the next question (no doll animation involved anymore)
+            loadQuestionAfterDoll: function() {
+                // This function is now directly called by initializeGameForQuestion or triggerNextQuestion
+                // No doll-specific waiting logic here.
+                loadQuestion();
+            },
 
-      loadQuestionAfterDoll: function() {
-        if (waitingForDoll) {
-          waitingForDoll = false;
-          loadQuestion();
+            // Triggers the next question after 'N' key press or touch
+            triggerNextQuestion: function() {
+                if (waitingForNextQuestionNKey) {
+                    waitingForNextQuestionNKey = false; // Reset the flag
+                    currentIndex++; // Move to the next question
+                    // If we've exhausted all unique questions, reset currentIndex to 0 to loop
+                    if (currentIndex >= questions.length) {
+                        currentIndex = 0;
+                        // Optionally, reshuffle here if you want a new random order after a full cycle
+                        questions = [...allQuestions].sort(() => 0.5 - Math.random());
+                    }
+
+                    window.gameController.showDollSeeingMessage(); // Show a brief message
+                    setTimeout(window.gameController.loadQuestionAfterDoll, 1500); // Load question after a short delay
+                }
+            },
+            waitingForNextQuestionNKey: waitingForNextQuestionNKey // Expose state for external access
+        };
+
+        // Initializes game state and starts the first question
+        const initializeGameForQuestion = () => {
+            // Reset game state for a new round of questions
+            questions = [...allQuestions].sort(() => 0.5 - Math.random()); // Shuffle questions
+            currentIndex = 0;
+            quizActive = true;
+            waitingForNextQuestionNKey = false; // Reset this state
+
+            // Clear any active timers from a previous game
+            clearInterval(timer);
+            timerEl.textContent = ""; // Clear timer display
+
+            // Directly load the first question after a short delay
+            questionEl.textContent = "Get ready for the first question...";
+            optionsEl.innerHTML = "";
+            setTimeout(loadQuestion, 1500); // Load question directly
+        };
+
+        // Starts the game from the welcome screen
+        function startGame() {
+            document.getElementById("welcome-screen").style.display = "none";
+            document.getElementById("game-container").style.display = "flex";
+
+            // Display "Rules" immediately when game starts and intro sound plays
+            questionEl.textContent = "🔊 Rules...";
+            optionsEl.innerHTML = ""; // Clear options while rules are playing
+
+            if (soundIntro) {
+                soundIntro.currentTime = 0; // Ensure it starts from the beginning
+
+                // Remove any existing 'ended' listeners before adding a new one to prevent multiple calls
+                soundIntro.removeEventListener('ended', handleIntroEnded);
+
+                // Add a named event listener for when the intro sound ends
+                function handleIntroEnded() {
+                    console.log("Intro audio ended. Initializing game for questions.");
+                    // Remove the listener after it fires to prevent multiple calls
+                    soundIntro.removeEventListener('ended', handleIntroEnded);
+
+                    // Directly initialize game after the audio ends
+                    initializeGameForQuestion();
+                }
+                soundIntro.addEventListener('ended', handleIntroEnded);
+
+                // Attempt to play the intro sound
+                soundIntro.play()
+                    .then(() => {
+                        console.log("Intro audio started playing.");
+                    })
+                    .catch(error => {
+                        console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
+                        // Fallback: If audio fails to play, still proceed with the game after a short delay
+                        soundIntro.removeEventListener('ended', handleIntroEnded); // Remove listener if play fails
+                        initializeGameForQuestion(); // Directly initialize game if audio fails
+                    });
+            } else {
+                console.warn("soundIntro audio element not found. Proceeding without intro sound.");
+                initializeGameForQuestion(); // Directly initialize game if no intro sound
+            }
         }
-      }
-    };
 
-    // Define a function to initialize game state and start doll animation for the first question
-    const initializeGameForQuestion = () => {
-        // Reset game state for a new round of questions
-        questions = [...allQuestions].sort(() => 0.5 - Math.random());
-        currentIndex = 0;
-        quizActive = true;
-        waitingForDoll = false; // Reset this state
+        // Loads a question into the display
+        function loadQuestion() {
+            clearInterval(timer); // Clear any existing timer
 
-        // Clear any active timers from a previous game
-        clearInterval(timer);
-        timerEl.textContent = ""; // Clear timer display
-        difficultyEl.textContent = ""; // Clear difficulty display
+            const q = questions[currentIndex];
+            timeLeft = 30; // Reset timer for new question
+            updateTimer();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) endGame("⏱️ Time's up!"); // End game if time runs out
+            }, 1000);
 
-        // Ensure lifeline 50:50 button is visible and enabled again for a new game
-        document.getElementById("lifeline5050").disabled = false;
-        document.getElementById("lifeline5050").style.display = ""; // Ensure it's visible
+            questionEl.textContent = q.q; // Display the question
+            optionsEl.innerHTML = ""; // Clear previous options
 
-        // Start the doll animation (which includes green light sound)
-        questionEl.textContent = "Loading..."; // Displays "Loading..." before doll turns
-        optionsEl.innerHTML = "";
-        if (window.dollController) {
-            window.dollController.playAction1();
-        }
-        waitingForDoll = true;
-    };
+            soundQuestion.currentTime = 0;
+            soundQuestion.play().catch(() => {}); // Play question sound
 
-
-    function startGame() {
-      document.getElementById("welcome-screen").style.display = "none";
-      document.getElementById("game-container").style.display = "flex";
-
-      // Display "Rules" immediately when game starts and intro sound plays
-      questionEl.textContent = "🔊 Rules...";
-      optionsEl.innerHTML = ""; // Clear options while rules are playing
-
-      if (soundIntro) {
-        soundIntro.currentTime = 0; // Ensure it starts from the beginning
-
-        // IMPORTANT: Remove any existing 'ended' listeners before adding a new one
-        soundIntro.removeEventListener('ended', handleIntroEnded);
-
-        // Add a named event listener for when the intro sound ends
-        function handleIntroEnded() {
-            console.log("Intro audio ended. Waiting 3 seconds, then initializing game for questions.");
-            // Remove the listener after it fires to prevent multiple calls
-            soundIntro.removeEventListener('ended', handleIntroEnded);
-
-            // Wait 3 seconds after the audio ends before initializing game and starting doll animation
-            setTimeout(initializeGameForQuestion, 3000); // 3000 milliseconds = 3 seconds
-        }
-        soundIntro.addEventListener('ended', handleIntroEnded);
-
-        // Attempt to play the intro sound
-        soundIntro.play()
-            .then(() => {
-                console.log("Intro audio started playing.");
-            })
-            .catch(error => {
-                console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
-                // Fallback: If audio fails to play, still proceed with the game after a short delay
-                soundIntro.removeEventListener('ended', handleIntroEnded); // Remove listener if play fails
-                setTimeout(initializeGameForQuestion, 1000); // Shorter fallback delay if audio fails
+            // Create option buttons
+            q.a.forEach((option, i) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = option;
+                btn.onclick = () => handleAnswer(i); // Attach click handler
+                optionsEl.appendChild(btn);
             });
-      } else {
-          console.warn("soundIntro audio element not found. Proceeding without intro sound.");
-          initializeGameForQuestion(); // Directly initialize game if no intro sound
-      }
-    }
-
-
-    // Removed updateProgress() function as progress bar is removed
-
-    function loadQuestion() {
-      clearInterval(timer);
-
-      // If we've exhausted all unique questions, reset currentIndex to 0 to loop
-      if (currentIndex >= questions.length) {
-        currentIndex = 0; // Loop back to the first question
-        // Optionally, reshuffle here if you want a new random order after a full cycle
-        // questions = [...allQuestions].sort(() => 0.5 - Math.random());
-      }
-
-      const q = questions[currentIndex];
-      timeLeft = 30;
-      updateTimer();
-      timer = setInterval(() => {
-        timeLeft--;
-        updateTimer();
-        if (timeLeft <= 0) endGame("⏱️ Time's up!"); // Still ends game on time out
-      }, 1000);
-
-      difficultyEl.textContent = `🔎 Difficulty: ${q.d.charAt(0).toUpperCase() + q.d.slice(1)}`;
-      questionEl.textContent = q.q;
-      optionsEl.innerHTML = "";
-
-      soundQuestion.currentTime = 0;
-      soundQuestion.play().catch(() => {});
-
-      q.a.forEach((option, i) => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.textContent = option;
-        btn.onclick = () => handleAnswer(i);
-        optionsEl.appendChild(btn);
-      });
-    }
-
-    function handleAnswer(i) {
-      clearInterval(timer);
-      const correct = questions[currentIndex].c;
-      const btns = optionsEl.querySelectorAll("button");
-      btns.forEach((btn, index) => {
-        btn.disabled = true;
-        if (index === correct) {
-          btn.style.backgroundColor = "#28a745";
-        } else if (index === i) {
-          btn.style.backgroundColor = "#dc3545";
         }
-      });
 
-      if (i === correct) {
-        soundCorrect.currentTime = 0;
-        soundCorrect.play().catch(() => {});
-        currentIndex++; // Move to next question
+        // Handles user's answer
+        function handleAnswer(i) {
+            clearInterval(timer); // Stop the timer
+            const correct = questions[currentIndex].c; // Get correct answer index
+            const btns = optionsEl.querySelectorAll("button");
 
-        setTimeout(() => {
-          // Start doll animation for next question
-          questionEl.textContent = "Loading...";
-          optionsEl.innerHTML = "";
-          if (window.dollController) {
-            window.dollController.playAction1();
-          }
-          waitingForDoll = true;
-        }, 1500);
-      } else {
-        soundWrong.currentTime = 0;
-        soundWrong.play().catch(() => {});
-        currentIndex++; // Move to next question even if wrong
+            // Disable all options and highlight correct/incorrect
+            btns.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === correct) {
+                    btn.style.backgroundColor = "#28a745"; // Green for correct
+                } else if (index === i) {
+                    btn.style.backgroundColor = "#dc3545"; // Red for incorrect
+                }
+            });
 
-        setTimeout(() => {
-          // Always proceed to the doll animation for the next question,
-          // as the game now loops questions indefinitely.
-          questionEl.textContent = "Loading...";
-          optionsEl.innerHTML = "";
-          if (window.dollController) {
-            window.dollController.playAction1();
-          }
-          waitingForDoll = true;
-        }, 1500);
-      }
-    }
+            // Play appropriate sound
+            if (i === correct) {
+                soundCorrect.currentTime = 0;
+                soundCorrect.play().catch(() => {});
+            } else {
+                soundWrong.currentTime = 0;
+                soundWrong.play().catch(() => {});
+            }
 
-    function updateTimer() {
-      timerEl.textContent = `⏱️ ${timeLeft}s`;
-    }
-
-    function endGame(msg) {
-      clearInterval(timer);
-      questionEl.textContent = msg;
-      optionsEl.innerHTML = "";
-      timerEl.textContent = "";
-      difficultyEl.textContent = "";
-      quizActive = false;
-      waitingForDoll = false;
-      // Ensure 50:50 button is visible for potential restart, but disabled if wanted
-      document.getElementById("lifeline5050").disabled = true; // Disable on game over
-    }
-
-    // `restartGame` function now simply calls `initializeGameForQuestion`
-    // It should ONLY be called by the "Restart" button.
-    function restartGame() {
-        // This will set up the game questions, reset state, and start the doll.
-        // It does NOT replay the intro sound.
-        initializeGameForQuestion();
-    }
-
-    function quitGame() {
-      endGame("🚪 You quit the game.");
-    }
-
-    // Placeholder lifeline functions
-    function use5050() {
-      document.getElementById("lifeline5050").disabled = true;
-      // Implementation for 50:50 lifeline
-      const currentQuestion = questions[currentIndex];
-      const correctOption = currentQuestion.c;
-      const options = optionsEl.querySelectorAll(".option-btn");
-      let optionsToRemove = 2;
-      const incorrectOptionsIndices = [];
-
-      for(let i=0; i < options.length; i++) {
-          if (i !== correctOption) {
-              incorrectOptionsIndices.push(i);
-          }
-      }
-
-      // Randomly select two incorrect options to hide
-      incorrectOptionsIndices.sort(() => 0.5 - Math.random());
-      for (let i = 0; i < optionsToRemove; i++) {
-          options[incorrectOptionsIndices[i]].style.visibility = 'hidden';
-      }
-    }
-
-    // Handle mobile touch (outside the quiz area)
-    document.addEventListener("touchstart", function(event) {
-      const quizArea = document.querySelector('.quiz-container-wrapper');
-      // Check if the touch is NOT within the quiz area AND doll is in 'waiting' state
-      if (!quizArea.contains(event.target) && window.dollController && window.dollController.getState() === 'waiting') {
-        window.dollController.playAction2();
-        if (window.gameController) {
-          window.gameController.showDollSeeingMessage();
+            // After feedback, wait for 'N' key press for the next question
+            waitingForNextQuestionNKey = true;
+            questionEl.textContent = "Press 'N' for the next question...";
+            optionsEl.innerHTML = ""; // Clear options
+            timerEl.textContent = ""; // Clear timer display
         }
-      }
-    });
-  </script>
+
+        // Updates the timer display
+        function updateTimer() {
+            timerEl.textContent = `⏱️ ${timeLeft}s`;
+        }
+
+        // Ends the game and displays a message
+        function endGame(msg) {
+            clearInterval(timer);
+            questionEl.textContent = msg;
+            optionsEl.innerHTML = "";
+            timerEl.textContent = "";
+            quizActive = false;
+            waitingForNextQuestionNKey = false; // Reset this flag
+        }
+
+        // Restarts the game
+        function restartGame() {
+            initializeGameForQuestion();
+        }
+
+        // Quits the game
+        function quitGame() {
+            endGame("🚪 You have quit the game. Better luck next time, player!"); // Updated quit message
+        }
+
+        // Handle mobile touch for 'Next Question'
+        document.addEventListener("touchstart", function(event) {
+            const quizArea = document.querySelector('.quiz-container-wrapper');
+            // Handle touch for 'Next Question' if waiting for N key and touch is outside quiz area
+            if (!quizArea.contains(event.target) && window.gameController.waitingForNextQuestionNKey) {
+                window.gameController.triggerNextQuestion();
+            }
+        });
+
+        // Keyboard event listener for 'N'
+        window.addEventListener('keydown', (event) => {
+            // Trigger next question
+            if (event.key.toLowerCase() === 'n' && window.gameController.waitingForNextQuestionNKey) {
+                window.gameController.triggerNextQuestion();
+            }
+        });
+    </script>
 </body>
 </html>
