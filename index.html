@@ -581,10 +581,13 @@ window.addEventListener('touchend', (e) => {
       quizActive = false;
       waitingForDoll = false;
     }
-
+const soundDollIdleLoop = document.getElementById('soundDollIdleLoop');
     // `restartGame` function now simply calls `initializeGameForQuestion`
     // It should ONLY be called by the "Restart" button.
     function restartGame() {
+soundDollIdleLoop.pause();
+soundDollIdleLoop.currentTime = 0;
+
         // This will set up the game questions, reset state, and start the doll.
         // It does NOT replay the intro sound.
         initializeGameForQuestion();
