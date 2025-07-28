@@ -596,6 +596,10 @@ soundDollIdleLoop.currentTime = 0;
     function quitGame() {
 soundDollIdleLoop.pause();
 soundDollIdleLoop.currentTime = 0;
+
+      if (window.dollController.getState() === 'waiting') {
+  window.dollController.playAction2(); // Play 180 to 0 only if currently at 180
+}
       
   clearInterval(timer);
   questionEl.textContent = "🚪 You quit the game.";
