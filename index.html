@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>KBC + GLB Model Background</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+    body { margin: 0; overflow: hidden; font-family: 'Orbitron', sans-serif; }
 
     canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
 
@@ -341,7 +342,6 @@ if (window.soundDollIdleLoop) {
     <div class="container" id="game-container">
       <div class="game-container">
         <div class="top-bar">
-          <div id="difficulty">🔎 Difficulty: Easy</div>
           <div id="timer">⏱️ 30s</div>
         </div>
         <div class="question" id="question">Loading...</div>
@@ -389,7 +389,6 @@ if (window.soundDollIdleLoop) {
     const questionEl = document.getElementById("question");
     const optionsEl = document.getElementById("options");
     const timerEl = document.getElementById("timer");
-    const difficultyEl = document.getElementById("difficulty");
     const soundCorrect = document.getElementById("soundCorrect");
     const soundWrong = document.getElementById("soundWrong");
     const soundQuestion = document.getElementById("soundQuestion");
@@ -422,7 +421,6 @@ if (window.soundDollIdleLoop) {
         // Clear any active timers from a previous game
         clearInterval(timer);
         timerEl.textContent = ""; // Clear timer display
-        difficultyEl.textContent = ""; // Clear difficulty display
 
         // Start the doll animation (which includes green light sound)
         questionEl.textContent = "Loading..."; // Displays "Loading..." before doll turns
@@ -498,7 +496,6 @@ if (window.soundDollIdleLoop) {
         if (timeLeft <= 0) endGame("⏱️ Time's up!"); // Still ends game on time out
       }, 1000);
 
-      difficultyEl.textContent = `🔎 Difficulty: ${q.d.charAt(0).toUpperCase() + q.d.slice(1)}`;
       questionEl.textContent = q.q;
       optionsEl.innerHTML = "";
 
@@ -568,7 +565,6 @@ if (window.soundDollIdleLoop) {
       questionEl.textContent = msg;
       optionsEl.innerHTML = "";
       timerEl.textContent = "";
-      difficultyEl.textContent = "";
       quizActive = false;
       waitingForDoll = false;
     }
