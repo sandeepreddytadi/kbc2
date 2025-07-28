@@ -581,65 +581,17 @@ window.addEventListener('touchend', (e) => {
       waitingForDoll = false;
     }
 
-    const actionName1 = "o to 18o degree";
-const actionName2 = "18o to o degree";
-
-action1 = mixer.clipAction(animations.find(a => a.name === actionName1));
-action2 = mixer.clipAction(animations.find(a => a.name === actionName2));
-
-
-let waitingForNext = false;
-
-function stopAllAudio() {
-  [soundIntro, soundRedLight, soundGreenLight, soundCorrect, soundWrong, soundQuestion].forEach(sound => {
-    if (sound) {
-      sound.pause();
-      sound.currentTime = 0;
+    // `restartGame` function now simply calls `initializeGameForQuestion`
+    // It should ONLY be called by the "Restart" button.
+    function restartGame() {
+        // This will set up the game questions, reset state, and start the doll.
+        // It does NOT replay the intro sound.
+        initializeGameForQuestion();
     }
-  });
-}
 
-window.restartGame = function () {
-  stopAllAudio();
-
-  // Reset animations to start from 180
-  if (action1) {
-    action2?.stop(); // stop the reverse rotation if it's playing
-    action1.reset().play(); // play o to 180o
-  }
-
-  // Reset question index, UI, etc.
-  currentIndex = 0;
-  score = 0;
-  updateScoreUI();
-  loadQuestion(currentIndex); // re-load the first question
-
-  // Play greenlight audio
-  soundGreenLight.currentTime = 0;
-  soundGreenLight.play();
-
-  // Reset UI texts
-  document.getElementById("question").innerText = "";
-  document.getElementById("options").innerHTML = "";
-
-  waitingForNext = false;
-};
-
-window.quitGame = function () {
-  stopAllAudio();
-
-  // Play reverse animation 180 to 0
-  if (action2) {
-    action1?.stop(); // stop forward rotation if it's playing
-    action2.reset().play();
-  }
-
-  // Clear UI
-  document.getElementById("question").innerText = "Game Ended.";
-  document.getElementById("options").innerHTML = "";
-
-  waitingForNext = true;
-};
+    function quitGame() {
+      endGame("🚪 You quit the game.");
+    }
 
     // Handle mobile touch (outside the quiz area)
     document.addEventListener("touchstart", function(event) {
