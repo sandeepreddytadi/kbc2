@@ -222,9 +222,14 @@
         // Listen for animation completion
         mixer.addEventListener('finished', function onFinished(e) {
           if (e.action === action1) {
-            dollAnimationState = 'waiting';
-            mixer.removeEventListener('finished', onFinished);
-          }
+  dollAnimationState = 'waiting';
+  mixer.removeEventListener('finished', onFinished);
+  // Start looping idle sound
+  if (window.soundDollIdleLoop) {
+    window.soundDollIdleLoop.currentTime = 0;
+    window.soundDollIdleLoop.play().catch(() => {});
+  }
+}
         });
       },
       playAction2: function() {
@@ -235,6 +240,11 @@
         action2.setLoop(THREE.LoopOnce);
         action2.clampWhenFinished = true;
         action2.play();
+        // Stop idle loop sound before red light
+if (window.soundDollIdleLoop) {
+  window.soundDollIdleLoop.pause();
+  window.soundDollIdleLoop.currentTime = 0;
+}
         // Play red light sound
         if (window.soundRedLight) {
           window.soundRedLight.currentTime = 0;
@@ -362,6 +372,7 @@
   <audio id="soundGreenLight" src="audio/doll-green-light.mp3" preload="auto"></audio>
   <audio id="soundRedLight" src="audio/doll-red-light.mp3" preload="auto"></audio>
   <audio id="soundIntro" src="audio/squid-game-rules.mp3" preload="auto"></audio>
+  <audio id="soundDollIdleLoop" src="audio/squid-game.mp3" preload="auto" loop></audio>
 
   <script>
     const allQuestions = [
