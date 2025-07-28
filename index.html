@@ -116,7 +116,7 @@
       cursor: not-allowed;
     }
 
-    .lifelines, .actions {
+ .actions {
       display: flex;
       justify-content: space-between;
       gap: 10px;
@@ -124,7 +124,7 @@
       flex-wrap: wrap;
     }
 
-    .lifeline-btn, .action-btn {
+ .action-btn {
       background-color: gold;
       color: black;
       font-weight: bold;
@@ -136,13 +136,8 @@
       transition: background-color 0.3s ease;
     }
 
-    .lifeline-btn:hover, .action-btn:hover {
+ .action-btn:hover {
       background-color: #ffd700;
-    }
-
-    .lifeline-btn:disabled {
-      background-color: gray;
-      cursor: not-allowed;
     }
 
     .top-bar {
@@ -345,9 +340,6 @@ if (window.soundDollIdleLoop) {
 
     <div class="container" id="game-container">
       <div class="game-container">
-        <div class="lifelines">
-          <button class="lifeline-btn" onclick="use5050()" id="lifeline5050">50:50</button>
-          </div>
         <div class="top-bar">
           <div id="difficulty">🔎 Difficulty: Easy</div>
           <div id="timer">⏱️ 30s</div>
@@ -431,10 +423,6 @@ if (window.soundDollIdleLoop) {
         clearInterval(timer);
         timerEl.textContent = ""; // Clear timer display
         difficultyEl.textContent = ""; // Clear difficulty display
-
-        // Ensure lifeline 50:50 button is visible and enabled again for a new game
-        document.getElementById("lifeline5050").disabled = false;
-        document.getElementById("lifeline5050").style.display = ""; // Ensure it's visible
 
         // Start the doll animation (which includes green light sound)
         questionEl.textContent = "Loading..."; // Displays "Loading..." before doll turns
@@ -583,8 +571,6 @@ if (window.soundDollIdleLoop) {
       difficultyEl.textContent = "";
       quizActive = false;
       waitingForDoll = false;
-      // Ensure 50:50 button is visible for potential restart, but disabled if wanted
-      document.getElementById("lifeline5050").disabled = true; // Disable on game over
     }
 
     // `restartGame` function now simply calls `initializeGameForQuestion`
@@ -597,29 +583,6 @@ if (window.soundDollIdleLoop) {
 
     function quitGame() {
       endGame("🚪 You quit the game.");
-    }
-
-    // Placeholder lifeline functions
-    function use5050() {
-      document.getElementById("lifeline5050").disabled = true;
-      // Implementation for 50:50 lifeline
-      const currentQuestion = questions[currentIndex];
-      const correctOption = currentQuestion.c;
-      const options = optionsEl.querySelectorAll(".option-btn");
-      let optionsToRemove = 2;
-      const incorrectOptionsIndices = [];
-
-      for(let i=0; i < options.length; i++) {
-          if (i !== correctOption) {
-              incorrectOptionsIndices.push(i);
-          }
-      }
-
-      // Randomly select two incorrect options to hide
-      incorrectOptionsIndices.sort(() => 0.5 - Math.random());
-      for (let i = 0; i < optionsToRemove; i++) {
-          options[incorrectOptionsIndices[i]].style.visibility = 'hidden';
-      }
     }
 
     // Handle mobile touch (outside the quiz area)
