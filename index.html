@@ -198,6 +198,7 @@
     import { OrbitControls } from 'OrbitControls';
 
     let scene, camera, renderer, mixer, clock;
+    let waitingForNext = false;
     let action1, action2;
     let dollAnimationState = 'idle'; // idle, animating, waiting
 
@@ -474,6 +475,38 @@ if (window.soundDollIdleLoop) {
       }
     }
 
+window.addEventListener('keydown', (e) => {
+  if (waitingForNext && e.key.toLowerCase() === 'n') {
+    waitingForNext = false;
+    currentIndex++; // move to next question
+    questionEl.textContent = "Loading...";
+    optionsEl.innerHTML = "";
+    if (window.dollController) {
+      window.dollController.playAction1();
+    }
+    waitingForDoll = true;
+  }
+});
+
+    // Detect tap/click outside canvas for mobile
+window.addEventListener('touchend', (e) => {
+  if (waitingForNext) {
+    const tappedElement = e.target;
+
+    // Avoid triggering if user tapped the 3D model canvas
+    if (tappedElement.tagName.toLowerCase() !== 'canvas') {
+      waitingForNext = false;
+      currentIndex++;
+      questionEl.textContent = "Loading...";
+      optionsEl.innerHTML = "";
+      if (window.dollController) {
+        window.dollController.playAction1();
+      }
+      waitingForDoll = true;
+    }
+  }
+});
+
 
     // Removed updateProgress() function as progress bar is removed
 
@@ -527,33 +560,12 @@ if (window.soundDollIdleLoop) {
       if (i === correct) {
         soundCorrect.currentTime = 0;
         soundCorrect.play().catch(() => {});
-        currentIndex++; // Move to next question
-
-        setTimeout(() => {
-          // Start doll animation for next question
-          questionEl.textContent = "Loading...";
-          optionsEl.innerHTML = "";
-          if (window.dollController) {
-            window.dollController.playAction1();
-          }
-          waitingForDoll = true;
-        }, 1500);
       } else {
         soundWrong.currentTime = 0;
         soundWrong.play().catch(() => {});
-        currentIndex++; // Move to next question even if wrong
-
-        setTimeout(() => {
-          // Always proceed to the doll animation for the next question,
-          // as the game now loops questions indefinitely.
-          questionEl.textContent = "Loading...";
-          optionsEl.innerHTML = "";
-          if (window.dollController) {
-            window.dollController.playAction1();
-          }
-          waitingForDoll = true;
-        }, 1500);
       }
+      // Set flag to wait for 'N' key
+      waitingForNext = true;
     }
 
     function updateTimer() {
