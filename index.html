@@ -494,6 +494,7 @@ window.addEventListener('keydown', (e) => {
       currentIndex++;
       questionEl.textContent = "Loading...";
       optionsEl.innerHTML = "";
+      timerEl.textContent = "";
       if (window.dollController) {
         window.dollController.playAction1();
       }
@@ -518,6 +519,7 @@ window.addEventListener('touchend', (e) => {
     currentIndex++;
     questionEl.textContent = "Loading...";
     optionsEl.innerHTML = "";
+    timerEl.textContent = "";
     if (window.dollController) {
       window.dollController.playAction1();
     }
