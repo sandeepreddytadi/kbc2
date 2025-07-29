@@ -387,6 +387,7 @@ if (window.soundDollIdleLoop) {
     let waitingForNext = false;
     let quizActive = false;
     let waitingForDoll = false;
+    let introOver = false;
 
     const questionEl = document.getElementById("question");
     const optionsEl = document.getElementById("options");
@@ -454,8 +455,11 @@ if (window.soundDollIdleLoop) {
             // Remove the listener after it fires to prevent multiple calls
             soundIntro.removeEventListener('ended', handleIntroEnded);
 
-            // Wait 3 seconds after the audio ends before initializing game and starting doll animation
-            setTimeout(initializeGameForQuestion, 3000); // 3000 milliseconds = 3 seconds
+            setTimeout(() => {
+  introOver = true;
+  questionEl.textContent = "Start Game";
+}, 3000);
+          
         }
         soundIntro.addEventListener('ended', handleIntroEnded);
 
@@ -468,7 +472,11 @@ if (window.soundDollIdleLoop) {
                 console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
                 // Fallback: If audio fails to play, still proceed with the game after a short delay
                 soundIntro.removeEventListener('ended', handleIntroEnded); // Remove listener if play fails
-                setTimeout(initializeGameForQuestion, 1000); // Shorter fallback delay if audio fails
+                setTimeout(() => {
+  introOver = true;
+  questionEl.textContent = "Start Game";
+}, 1000);
+              
             });
       } else {
           console.warn("soundIntro audio element not found. Proceeding without intro sound.");
@@ -477,25 +485,11 @@ if (window.soundDollIdleLoop) {
     }
 
 window.addEventListener('keydown', (e) => {
-  if (waitingForNext && e.key.toLowerCase() === 'n') {
-    waitingForNext = false;
-    currentIndex++; // move to next question
-    questionEl.textContent = "Loading...";
-    optionsEl.innerHTML = "";
-    if (window.dollController) {
-      window.dollController.playAction1();
-    }
-    waitingForDoll = true;
-  }
-});
-
-    // Detect tap/click outside canvas for mobile
-window.addEventListener('touchend', (e) => {
-  if (waitingForNext) {
-    const tappedElement = e.target;
-
-    // Avoid triggering if user tapped the 3D model canvas
-    if (tappedElement.tagName.toLowerCase() !== 'canvas') {
+  if (e.key.toLowerCase() === 'n') {
+    if (!quizActive && introOver) {
+      introOver = false;
+      initializeGameForQuestion();
+    } else if (waitingForNext) {
       waitingForNext = false;
       currentIndex++;
       questionEl.textContent = "Loading...";
@@ -505,6 +499,29 @@ window.addEventListener('touchend', (e) => {
       }
       waitingForDoll = true;
     }
+  }
+});
+
+
+    // Detect tap/click outside canvas for mobile
+window.addEventListener('touchend', (e) => {
+  const tappedElement = e.target;
+
+  if (introOver && tappedElement.tagName.toLowerCase() === 'canvas') {
+    introOver = false;
+    initializeGameForQuestion();
+    return;
+  }
+
+  if (waitingForNext && tappedElement.tagName.toLowerCase() !== 'canvas') {
+    waitingForNext = false;
+    currentIndex++;
+    questionEl.textContent = "Loading...";
+    optionsEl.innerHTML = "";
+    if (window.dollController) {
+      window.dollController.playAction1();
+    }
+    waitingForDoll = true;
   }
 });
 
