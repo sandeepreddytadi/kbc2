@@ -592,9 +592,7 @@ window.addEventListener('touchend', (e) => {
 
     function endGame(msg) {
       clearInterval(timer);
-      questionEl.textContent = msg;
-      optionsEl.innerHTML = "";
-      timerEl.textContent = "";
+      timerEl.textContent = msg;
       quizActive = false;
       waitingForDoll = false;
     }
