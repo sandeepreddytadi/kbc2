@@ -275,10 +275,24 @@ if (window.soundDollIdleLoop) {
     function init() {
       clock = new THREE.Clock();
       scene = new THREE.Scene();
-      const textureLoader = new THREE.TextureLoader();
-textureLoader.load('background.jpeg', function(texture) {
-  scene.background = texture;
-});
+      // Create a canvas with a black to blue vertical gradient
+const canvas = document.createElement('canvas');
+canvas.width = 512;
+canvas.height = 512;
+const context = canvas.getContext('2d');
+
+// Vertical gradient from black (top) to blue (bottom)
+const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+gradient.addColorStop(0, '#000000'); // Black
+gradient.addColorStop(1, '#0000ff'); // Blue
+
+context.fillStyle = gradient;
+context.fillRect(0, 0, canvas.width, canvas.height);
+
+// Use the gradient as background texture
+const gradientTexture = new THREE.CanvasTexture(canvas);
+scene.background = gradientTexture;
+
 
       camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(0, 5, 20);
