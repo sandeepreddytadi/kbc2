@@ -297,7 +297,7 @@ scene.add(ambientLight);
 
 // Main front-facing directional light (perfectly centered)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(0, 0, 10); // straight in front of doll
+directionalLight.position.set(10, 0, 0); // straight in front of doll
 directionalLight.target.position.set(0, 0, 0); // center of scene (doll)
 scene.add(directionalLight);
 scene.add(directionalLight.target);
