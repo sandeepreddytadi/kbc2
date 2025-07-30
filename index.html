@@ -291,11 +291,23 @@ textureLoader.load('background.jpg', function(texture) {
       controls.target.set(0, 5, 0);
       controls.update();
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(30, 50, 10);
-      scene.add(directionalLight);
+      // Ambient Light (soft overall lighting)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+// Hemisphere Light (sky + ground light, soft and even)
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+scene.add(hemiLight);
+
+// Directional Light (like sunlight, aimed at the doll)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+directionalLight.position.set(0, 20, 10);  // From top-center front
+scene.add(directionalLight);
+
+// Optional: target the doll model (if it’s named or assigned to a variable)
+directionalLight.target.position.set(0, 0, 0);
+scene.add(directionalLight.target);
+
 
       const loader = new GLTFLoader();
       loader.load('doll.glb', function (gltf) {
