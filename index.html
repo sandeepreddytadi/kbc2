@@ -276,22 +276,34 @@ if (window.soundDollIdleLoop) {
       clock = new THREE.Clock();
       scene = new THREE.Scene();
       
-// Create a canvas with a mostly black to electric blue gradient
+
+// Create canvas and context
 const canvas = document.createElement('canvas');
 canvas.width = 512;
 canvas.height = 512;
-const context = canvas.getContext('2d');
+const ctx = canvas.getContext('2d');
 
-// Vertical gradient: mostly black with a touch of electric blue
-const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-gradient.addColorStop(0.0, '#000000');       // Top - pure black
-gradient.addColorStop(0.7, '#000000');       // 70% down - still black
-gradient.addColorStop(1.0, '#00ffff');       // Bottom - electric/neon blue (cyan)
+// Generate a vertical gradient with random electric blue placement
+const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 
-context.fillStyle = gradient;
-context.fillRect(0, 0, canvas.width, canvas.height);
+// Always start with black
+gradient.addColorStop(0, '#000000');
 
-// Use the gradient as the scene background
+// Add a few random neon blue stops
+for (let i = 0; i < 3; i++) {
+  const stopPosition = Math.random(); // Random position between 0 and 1
+  const neonColor = ['#00ffff', '#00ccff', '#1ec8ff'][Math.floor(Math.random() * 3)];
+  gradient.addColorStop(stopPosition, neonColor);
+}
+
+// Always end with black
+gradient.addColorStop(1, '#000000');
+
+// Apply to canvas
+ctx.fillStyle = gradient;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Use as Three.js background texture
 const gradientTexture = new THREE.CanvasTexture(canvas);
 scene.background = gradientTexture;
 
