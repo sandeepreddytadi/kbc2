@@ -382,19 +382,26 @@ scene.add(hemiLight);
 
   <script>
     const allQuestions = [
-      { q: "Which company developed GPT-4?", a: ["Google", "OpenAI", "Meta", "IBM"], c: 1, d: "easy" },
-      { q: "What does AI stand for?", a: ["Automated Input", "Artificial Intelligence", "Advanced Interface", "Analog Input"], c: 1, d: "easy" },
-      { q: "Primary language for TensorFlow?", a: ["Java", "C++", "Python", "Ruby"], c: 2, d: "medium" },
-      { q: "Purpose of GPU in AI?", a: ["Power", "Rendering", "Parallel processing", "Memory"], c: 2, d: "medium" },
-      { q: "Facebook AI framework?", a: ["Keras", "Theano", "PyTorch", "CNTK"], c: 2, d: "medium" },
-      { q: "NLP stands for?", a: ["Neural LP", "Natural Language Processing", "Net Language Python", "None"], c: 1, d: "easy" },
-      { q: "Image recognition model?", a: ["CNN", "RNN", "GAN", "MLP"], c: 0, d: "medium" },
-      { q: "Google's AI assistant?", a: ["Alexa", "Siri", "Google Assistant", "Bixby"], c: 2, d: "easy" },
-      { q: "Non ML type?", a: ["Supervised", "Reinforcement", "Sequential", "Unsupervised"], c: 2, d: "medium" },
-      { q: "Activation function use?", a: ["Normalize", "Overfit", "Initialize", "Non-linearity"], c: 3, d: "medium" },
-      { q: "BERT by?", a: ["IBM", "Google", "Meta", "Amazon"], c: 1, d: "medium" },
-      { q: "GAN stands for?", a: ["Graphical AI Network", "General Adv Network", "Generative Adversarial Network", "Generic AI Node"], c: 2, d: "medium" }
-    ];
+  { q: "What does GPT stand for?", a: ["Global Processing Tool", "Generative Pre trained Transformer", "General Purpose Technology", "Graphic Programming Template"], c: 1 },
+
+  { q: "What should organization consider before implementing AI?", a: ["Ethics, privacy and accuracy", "Only the cost savings", "Only the speed improvements", "Only employee reactions"], c: 0 },
+
+  { q: "What is neural network inspired by?", a: ["The human brain", "Telephone networks", "Road systems", "Computer Circuits"], c: 0 },
+
+  { q: "What is 'Deep Learning' a subset of?", a: ["Expert Systems", "Machine Vision", "Robotics", "Machine Learning"], c: 3 },
+
+  { q: "Which company developed GPT-4?", a: ["Meta", "Google", "IBM", "OpenAI"], c: 3 },
+
+  { q: "What does AI stand for?", a: ["Analog Input", "Artificial Intelligence", "Automated Input", "Advanced Interface"], c: 1 },
+
+  { q: "NLP stands for?", a: ["None", "Net Language Python", "Natural Language Processing", "Neural LP"], c: 2 },
+
+  { q: "What type of content can Generative AI create?", a: ["Only Images", "Only Texts", "Only computer programs", "Texts, Images, Music and Code"], c: 3 },
+
+  { q: "What does 'LLM' stand for in AI?", a: ["Large Learning Machine", "Large Learning Model", "Large Language Model", "Large Language Module"], c: 2 },
+
+  { q: "GAN stands for?", a: ["Generative Adversarial Network", "Generic AI Node", "Graphical AI Network", "General Adv Network"], c: 0 }
+];
 
     let questions, currentIndex = 0, timer, timeLeft = 30;
     let waitingForNext = false;
