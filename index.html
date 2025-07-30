@@ -275,21 +275,23 @@ if (window.soundDollIdleLoop) {
     function init() {
       clock = new THREE.Clock();
       scene = new THREE.Scene();
-      // Create a canvas with a black to blue vertical gradient
+      
+// Create a canvas with a mostly black to electric blue gradient
 const canvas = document.createElement('canvas');
 canvas.width = 512;
 canvas.height = 512;
 const context = canvas.getContext('2d');
 
-// Vertical gradient from black (top) to blue (bottom)
+// Vertical gradient: mostly black with a touch of electric blue
 const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-gradient.addColorStop(0, '#000000'); // Black
-gradient.addColorStop(1, '#0000ff'); // Blue
+gradient.addColorStop(0.0, '#000000');       // Top - pure black
+gradient.addColorStop(0.7, '#000000');       // 70% down - still black
+gradient.addColorStop(1.0, '#00ffff');       // Bottom - electric/neon blue (cyan)
 
 context.fillStyle = gradient;
 context.fillRect(0, 0, canvas.width, canvas.height);
 
-// Use the gradient as background texture
+// Use the gradient as the scene background
 const gradientTexture = new THREE.CanvasTexture(canvas);
 scene.background = gradientTexture;
 
