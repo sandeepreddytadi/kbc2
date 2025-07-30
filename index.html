@@ -455,11 +455,7 @@ function startGame() {
   questionEl.textContent = "🔊 Rules...";
   optionsEl.innerHTML = "";
 
-  // After short delay, allow user to proceed with 'N' or touch
-  setTimeout(() => {
-    introOver = true;
-    questionEl.textContent = "Start Game";
-  }, 1000); // You can change 1000 (1 second) to 0 if instant transition is desired
+  introOver = true;
 }
 
     
