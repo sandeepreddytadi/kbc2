@@ -447,56 +447,22 @@ scene.add(hemiLight);
         waitingForDoll = true;
     };
 
+function startGame() {
+  document.getElementById("welcome-screen").style.display = "none";
+  document.getElementById("game-container").style.display = "flex";
 
-    function startGame() {
-      document.getElementById("welcome-screen").style.display = "none";
-      document.getElementById("game-container").style.display = "flex";
+  // Show rules text only — no audio
+  questionEl.textContent = "🔊 Rules...";
+  optionsEl.innerHTML = "";
 
-      // Display "Rules" immediately when game starts and intro sound plays
-      questionEl.textContent = "🔊 Rules...";
-      optionsEl.innerHTML = ""; // Clear options while rules are playing
+  // After short delay, allow user to proceed with 'N' or touch
+  setTimeout(() => {
+    introOver = true;
+    questionEl.textContent = "Start Game";
+  }, 1000); // You can change 1000 (1 second) to 0 if instant transition is desired
+}
 
-      if (soundIntro) {
-        soundIntro.currentTime = 0; // Ensure it starts from the beginning
-
-        // IMPORTANT: Remove any existing 'ended' listeners before adding a new one
-        soundIntro.removeEventListener('ended', handleIntroEnded);
-
-        // Add a named event listener for when the intro sound ends
-        function handleIntroEnded() {
-            console.log("Intro audio ended. Waiting 3 seconds, then initializing game for questions.");
-            // Remove the listener after it fires to prevent multiple calls
-            soundIntro.removeEventListener('ended', handleIntroEnded);
-
-            setTimeout(() => {
-  introOver = true;
-  questionEl.textContent = "Start Game";
-}, 3000);
-          
-        }
-        soundIntro.addEventListener('ended', handleIntroEnded);
-
-        // Attempt to play the intro sound
-        soundIntro.play()
-            .then(() => {
-                console.log("Intro audio started playing.");
-            })
-            .catch(error => {
-                console.warn("Intro audio play failed (could be blocked even after click, or other error):", error);
-                // Fallback: If audio fails to play, still proceed with the game after a short delay
-                soundIntro.removeEventListener('ended', handleIntroEnded); // Remove listener if play fails
-                setTimeout(() => {
-  introOver = true;
-  questionEl.textContent = "Start Game";
-}, 1000);
-              
-            });
-      } else {
-          console.warn("soundIntro audio element not found. Proceeding without intro sound.");
-          initializeGameForQuestion(); // Directly initialize game if no intro sound
-      }
-    }
-
+    
 window.addEventListener('keydown', (e) => {
   if (e.key.toLowerCase() === 'n') {
     if (!quizActive && introOver) {
