@@ -46,6 +46,13 @@
       color: gold;
     }
 
+    .welcome-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
     .start-btn {
       background-color: gold;
       color: black;
@@ -338,6 +345,7 @@ textureLoader.load('background.jpg', function(texture) {
   <div class="quiz-container-wrapper">
     <div class="welcome-screen" id="welcome-screen">
       <div class="welcome-logo">🌟 KBC - Gen AI & Tech Edition</div>
+      <img src="welcome.png" alt="Welcome Image" class="welcome-image">
       <button class="start-btn" onclick="startGame()">▶️ Start Game</button>
     </div>
 
