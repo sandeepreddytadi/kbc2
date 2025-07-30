@@ -494,16 +494,6 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-     // Press 'a', 'b', 'c', or 'd' to select an answer
-  if (quizActive && ['a', 'b', 'c', 'd'].includes(key)) {
-    const index = { a: 0, b: 1, c: 2, d: 3 }[key];
-    const buttons = document.querySelectorAll(".option-btn");
-    if (buttons[index]) {
-      buttons[index].click();
-    }
-  }
-});
-
 
     window.addEventListener('touchend', (e) => {
   const tappedElement = e.target;
