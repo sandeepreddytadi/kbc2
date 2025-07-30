@@ -273,8 +273,8 @@ if (window.soundDollIdleLoop) {
     function init() {
       clock = new THREE.Clock();
       scene = new THREE.Scene();
-      const loader = new TextureLoader();
-loader.load('background.jpg', function(texture) {
+      const textureLoader = new THREE.TextureLoader();
+textureLoader.load('background.jpg', function(texture) {
   scene.background = texture;
 });
 
