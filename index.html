@@ -291,20 +291,18 @@ textureLoader.load('background.jpg', function(texture) {
       controls.target.set(0, 5, 0);
       controls.update();
 
-     // Ambient Light - low, for soft global lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+     // Soft ambient light for general illumination
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
 scene.add(ambientLight);
 
-// Directional Light - main light shining from front/top
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-directionalLight.position.set(0, 10, 10);  // directly in front and slightly above
+// Main front-facing directional light (perfectly centered)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(0, 0, 10); // straight in front of doll
+directionalLight.target.position.set(0, 0, 0); // center of scene (doll)
 scene.add(directionalLight);
-
-// Target the center of the scene (or your doll object if named)
-directionalLight.target.position.set(0, 0, 0);
 scene.add(directionalLight.target);
 
-// Optional: add Hemisphere Light for ambient sky/ground effect
+// Optional: Hemisphere for smoother overall look
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x333333, 0.2);
 scene.add(hemiLight);
 
